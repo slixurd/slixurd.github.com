@@ -1,0 +1,1078 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.3"/>
+
+
+
+
+  <meta name="keywords" content="slixurd" />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.3" />
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    analytics: {
+      google: ''
+    },
+    sidebar: 'post'
+  };
+</script>
+
+
+
+
+  <title> slixurd </title>
+</head>
+
+<body>
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+
+  <div class="container one-column 
+   page-home 
+">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">slixurd</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<div class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/">
+            <i class="menu-item-icon icon-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            <i class="menu-item-icon icon-about"></i> <br />
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            <i class="menu-item-icon icon-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            <i class="menu-item-icon icon-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+  <div id="posts" class="posts-expand">
+    
+      
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              <a class="post-title-link" href="/2013/06/01/piwik_api/">
+                Piwik源码分析及API编写
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2013-06-01
+        </span>
+
+        
+
+        
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <h1 id="Piwik源码分析及API编写">Piwik源码分析及API编写</h1><p>Piwik提供了一整套的事件统计,分析功能,并且可以以xml,json提供返回数据,还可以生成图表.</p>
+<p>Piwik提供了Api的编写的一套方案,Coder只需要专注于数据的的处理即可.在Piwik根目录下有一个plugins的文件夹,文件夹下即当前所有的插件.最简单的额学习方式就是查看ExampleAPI和ExamplePlugin,代码风格已经很不错了,看起来其实也还不错.</p>
+<p>一个API建立的最简单的流程就是在plugin目录下建立一个文件夹,例如Example.目录下新建API.php,类名为Piwik_PluginName_API</p>
+<pre><code><span class="php"><span class="preprocessor">&lt;?php</span>
+    <span class="class"><span class="keyword">class</span> <span class="title">Piwik_Example_API</span></span>{
+        <span class="keyword">static</span> <span class="keyword">private</span> <span class="variable">$instance</span> = <span class="keyword">null</span>;
+
+        <span class="keyword">static</span> <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getInstance</span><span class="params">()</span>
+        </span>{
+            <span class="keyword">if</span> (<span class="keyword">self</span>::<span class="variable">$instance</span> == <span class="keyword">null</span>)
+            {
+                <span class="keyword">self</span>::<span class="variable">$instance</span> = <span class="keyword">new</span> <span class="keyword">self</span>;
+            }
+            <span class="keyword">return</span> <span class="keyword">self</span>::<span class="variable">$instance</span>;
+        }
+
+        <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getDatatable</span><span class="params">()</span></span>{
+            <span class="variable">$datatable</span> = <span class="keyword">array</span>();
+            <span class="variable">$datatable</span>[<span class="string">"start"</span>]=<span class="string">"OK"</span>;
+            <span class="keyword">return</span> <span class="variable">$datatable</span>;
+        }
+    }</span>
+</code></pre><p>然后就可以通过localhost/piwik/index.php?module=API&amp;method=Example.getDatatable&amp;format=xml&amp;token_auth=<em>*</em>访问(搭建在本机的piwik,token在登录以后可以查询).显然,这里用了单例模式,防止多次被实例化.</p>
+<p>下面提示几个需要注意的地方.</p>
+<p>如果需要接受GET/POST的值,不要直接使用$_GET/POST,使用系统自带的Piwik_Common::getRequestVar(‘NAME’);</p>
+<p>为了避免数据库注入攻击,不要直接用GET得到的参数执行查询语句<br>例如</p>
+<pre><code><span class="php"><span class="preprocessor">&lt;?php</span>
+<span class="variable">$idsite</span> = <span class="variable">$_GET</span>[<span class="string">'value'</span>];
+Piwik_Query( <span class="string">"SELECT * FROM "</span>.Piwik_Common::prefixTable(<span class="string">'site'</span>).<span class="string">" WHERE idsite = $idsite"</span> );</span>
+</code></pre><p>此时可以提交”1 OR 1”这样的字符串,查询语句就会是:”SELECT * FROM piwik_site WHERE idsite = 1 OR 1”<br>这样就会显示所有的站点.</p>
+<p>当然,也可以自己对注入攻击进行处理,mysql_real_escape_string()什么的.</p>
+<p>数据库的查询是用Piwik自带的函数</p>
+<p>• function Piwik_Query( $sqlQuery, $parameters = array())<br>• function Piwik_FetchAll( $sqlQuery, $parameters = array())<br>• function Piwik_FetchOne( $sqlQuery, $parameters = array())</p>
+<pre><code><span class="php"><span class="preprocessor">&lt;?php</span>
+    <span class="variable">$feedburnerFeedName</span> = Piwik_FetchOne(<span class="string">'SELECT feedburnerName
+    FROM '</span>.Piwik_Common::prefixTable(<span class="string">'site'</span>).
+    <span class="string">' WHERE idsite = ? and name = ?'</span>,
+    <span class="keyword">array</span>( Piwik_Common::getRequestVar(<span class="string">'idSite'</span>), Piwik_Common::getRequestVar(<span class="string">'name'</span>) )
+);</span>
+</code></pre><p>$sqlQuery中为”?”的地方可以一一匹配数据值,将数据和sql语句分开.</p>
+<p>Piwik支持以segment作为filiter对已选择的数据进行过滤,以下的gist就是当segment=browser==FF的情况下源码生成的数组及所有<a href="https://gist.github.com/slixurd/5689728" target="_blank" rel="external">所有支持的segment</a></p>
+<p>对于数据库的查询,给出<code>Live.getLastVisitsDetails (idSite, period, date, segment = &#39;&#39;, filter_limit = &#39;&#39;, maxIdVisit = &#39;&#39;, minTimestamp = &#39;&#39;)</code>的代码分析</p>
+<pre><code><span class="variable">$visitorDetails</span> = <span class="variable">$this</span>-&gt;loadLastVisitorDetailsFromDatabase(<span class="variable">$idSite</span>, <span class="variable">$period</span>, <span class="variable">$date</span>, <span class="variable">$segment</span>, <span class="variable">$filter_limit</span>, <span class="variable">$maxIdVisit</span>, <span class="variable">$visitorId</span> = <span class="keyword">false</span>, <span class="variable">$minTimestamp</span>);
+
+<span class="variable">$dataTable</span> = <span class="variable">$this</span>-&gt;getCleanedVisitorsFromDetails(<span class="variable">$visitorDetails</span>, <span class="variable">$idSite</span>);
+</code></pre><p><strong>首先是loadLastVisitorDetailsFromDatabase()这个函数里面,实际上就只是处理数据然后对数据库进行读取,整套系统其实也都是这么做而已</strong></p>
+<pre><code><span class="variable">$where</span>
+<span class="keyword">array</span>(
+    [<span class="number">0</span>] =&gt; <span class="string">'log_visit.idsite = ? '</span>
+    [<span class="number">1</span>] =&gt; <span class="string">'log_visit.visit_last_action_time &gt;= ?'</span>
+)
+<span class="variable">$whereBind</span>
+<span class="keyword">array</span>(
+    [<span class="number">0</span>] =&gt;<span class="number">4</span>
+    [<span class="number">1</span>] =&gt;<span class="string">'2013-04-30 16:00:00'</span>
+)
+</code></pre><p>使用join组合成字符串</p>
+<pre><code><span class="keyword">if</span>(count(<span class="variable">$where</span>) &gt; <span class="number">0</span>)
+{
+    <span class="variable">$where</span> = join(<span class="string">" 
+        AND "</span>, <span class="variable">$where</span>);
+}
+
+<span class="built_in">log</span>_visit.idsite = ? AND <span class="built_in">log</span>_visit.visit_last_action_time &gt;= ?
+</code></pre><p>最后通过segment组合</p>
+<pre><code>segment =Piwik_SegmentExpression(
+    joins =
+    valuesBind =
+    parsedTree =
+    tree = <span class="keyword">array</span>(
+    [<span class="number">0</span>] =&gt;<span class="keyword">array</span>(
+        [<span class="number">0</span>] =&gt;                    
+        [<span class="number">1</span>] =&gt; <span class="string">'browserName==FF'</span>
+    )
+)
+parsedSubExpressions = <span class="keyword">array</span>(
+    [<span class="number">0</span>] =&gt;<span class="keyword">array</span>(
+        [<span class="number">0</span>] =&gt;
+        [<span class="number">1</span>] =&gt;<span class="keyword">array</span>(
+            [<span class="number">0</span>] =&gt;<span class="string">'log_visit.config_browser_name'</span>
+            [<span class="number">1</span>] =&gt;<span class="string">'=='</span>
+            [<span class="number">2</span>] =&gt;<span class="string">'FF'</span>
+        )
+    )
+)
+string = <span class="string">'browserName==FF'</span>
+)
+
+    <span class="variable">$select</span> = <span class="string">"log_visit.*"</span>;
+    <span class="variable">$from</span> = <span class="string">"log_visit"</span>;
+    <span class="variable">$subQuery</span> = <span class="variable">$segment</span>-&gt;getSelectQuery(<span class="variable">$select</span>, <span class="variable">$from</span>, <span class="variable">$where</span>, <span class="variable">$whereBind</span>, <span class="variable">$orderBy</span>);
+
+
+<span class="keyword">array</span>(
+    [<span class="string">'sql'</span>] =&gt;<span class="string">'
+        SELECT
+        log_visit.*
+        FROM
+        piwik_log_visit AS log_visit
+        WHERE
+        ( log_visit.idsite = ?
+        AND log_visit.visit_last_action_time &gt;= ? )
+        AND
+        ( log_visit.config_browser_name = ? )
+        ORDER BY
+        idsite, visit_last_action_time DESC'</span>
+    [<span class="string">'bind'</span>] =&gt;<span class="keyword">array</span>(
+        [<span class="number">0</span>] =&gt;<span class="number">4</span>
+        [<span class="number">1</span>] =&gt;<span class="string">'2013-04-30 16:00:00'</span>
+        [<span class="number">2</span>] =&gt;<span class="string">'FF'</span>
+    )
+)
+</code></pre><hr>
+<pre><code>SQL的再度组装
+
+    <span class="label">$sql</span> = "
+        SELECT sub.* 
+        FROM ( 
+            <span class="string">".$subQuery['sql']."</span>
+            <span class="label">$sqlLimit</span>
+        ) <span class="keyword">AS</span> sub
+        GROUP <span class="keyword">BY</span> sub.idvisit
+        <span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="label">$orderByParent</span>
+    "; 
+
+
+SELECT sub.* 
+FROM ( 
+    SELECT log_visit.* 
+    FROM piwik_log_visit <span class="keyword">AS</span> log_visit 
+    WHERE ( log_visit.idsite = ? AND log_visit.visit_last_action_time &gt;= ? ) 
+        AND ( log_visit.config_browser_name = ? ) 
+    <span class="keyword">ORDER</span> <span class="keyword">BY</span> idsite, visit_last_action_time <span class="keyword">DESC</span> LIMIT 100 ) 
+<span class="keyword">AS</span> sub 
+GROUP <span class="keyword">BY</span> sub.idvisit 
+<span class="keyword">ORDER</span> <span class="keyword">BY</span> sub.visit_last_action_time <span class="keyword">DESC</span> 
+
+<span class="label">$data</span> = Piwik_FetchAll(<span class="label">$sql</span>, <span class="label">$subQuery</span>['bind']);
+
+进行查询
+</code></pre><p>查询结束就会返回$visitorDetails,再通过这个数据进行详细查询和空值的过滤getCleanedVisitorsFromDetails()</p>
+<hr>
+<pre><code>[<span class="number">9</span>] =&gt;<span class="keyword">array</span>(
+
+    [<span class="string">'type'</span>] =&gt;<span class="number">1</span>
+    [<span class="string">'url'</span>] =&gt;<span class="string">'localhost/test/'</span>
+    [<span class="string">'url_prefix'</span>] =&gt;<span class="number">0</span>
+    [<span class="string">'pageTitle'</span>] =&gt;[<span class="string">'pageIdAction'</span>] =&gt;<span class="number">11</span>
+    [<span class="string">'pageId'</span>] =&gt;<span class="number">9101</span>
+    [<span class="string">'serverTimePretty'</span>] =&gt;<span class="string">'2013-05-25 05:59:38'</span>
+    [<span class="string">'timeSpentRef'</span>] =&gt;<span class="number">1</span>
+    [<span class="string">'custom_var_k1'</span>] =&gt;<span class="string">'section1'</span>
+    [<span class="string">'custom_var_v1'</span>] =&gt;<span class="string">'third'</span>
+    [<span class="string">'custom_var_k2'</span>] =&gt;<span class="string">'section2'</span>
+    [<span class="string">'custom_var_v2'</span>] =&gt;<span class="string">'second'</span>
+)
+[<span class="number">10</span>] =&gt;<span class="keyword">array</span>(
+
+    [<span class="string">'type'</span>] =&gt;<span class="number">1</span>
+    [<span class="string">'url'</span>] =&gt;<span class="string">'localhost/test/'</span>
+    [<span class="string">'url_prefix'</span>] =&gt;<span class="number">0</span>
+    [<span class="string">'pageTitle'</span>] =&gt;[<span class="string">'pageIdAction'</span>] =&gt;<span class="number">11</span>
+    [<span class="string">'pageId'</span>] =&gt;<span class="number">9102</span>
+    [<span class="string">'serverTimePretty'</span>] =&gt;<span class="string">'2013-05-25 06:00:08'</span>
+    [<span class="string">'timeSpentRef'</span>] =&gt;<span class="number">30</span>
+    [<span class="string">'custom_var_k1'</span>] =&gt;<span class="string">'section1'</span>
+    [<span class="string">'custom_var_v1'</span>] =&gt;<span class="string">'first'</span>
+    [<span class="string">'custom_var_k2'</span>] =&gt;<span class="string">'section2'</span>
+    [<span class="string">'custom_var_v2'</span>] =&gt;<span class="string">'second'</span>
+    )
+[<span class="number">11</span>] =&gt;<span class="keyword">array</span>(
+
+    [<span class="string">'type'</span>] =&gt;<span class="number">1</span>
+    [<span class="string">'url'</span>] =&gt;<span class="string">'localhost/test/'</span>
+    [<span class="string">'url_prefix'</span>] =&gt;<span class="number">0</span>
+    [<span class="string">'pageTitle'</span>] =&gt;[<span class="string">'pageIdAction'</span>] =&gt;<span class="number">11</span>
+    [<span class="string">'pageId'</span>] =&gt;<span class="number">9103</span>
+    [<span class="string">'serverTimePretty'</span>] =&gt;<span class="string">'2013-05-25 06:00:50'</span>
+    [<span class="string">'timeSpentRef'</span>] =&gt;<span class="number">42</span>
+) 
+</code></pre><p>以上为执行$actionDetails = Piwik_FetchAll($sql, array($idvisit));之后的原始数据</p>
+<pre><code><span class="tag">&lt;<span class="title">row</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">type</span>&gt;</span>action<span class="tag">&lt;/<span class="title">type</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">url</span>&gt;</span>http://localhost/test/<span class="tag">&lt;/<span class="title">url</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">pageTitle</span>/&gt;</span>
+    <span class="tag">&lt;<span class="title">pageIdAction</span>&gt;</span>11<span class="tag">&lt;/<span class="title">pageIdAction</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">pageId</span>&gt;</span>9101<span class="tag">&lt;/<span class="title">pageId</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">serverTimePretty</span>&gt;</span>周六 25 五月 13:59:38    <span class="tag">&lt;/<span class="title">serverTimePretty</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">customVariables</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">row</span>&gt;</span>
+            <span class="tag">&lt;<span class="title">customVariableName1</span>&gt;</span>section1<span class="tag">&lt;/<span class="title">customVariableName1</span>&gt;</span>
+            <span class="tag">&lt;<span class="title">customVariableValue1</span>&gt;</span>third<span class="tag">&lt;/<span class="title">customVariableValue1</span>&gt;</span>
+        <span class="tag">&lt;/<span class="title">row</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">row</span>&gt;</span>
+            <span class="tag">&lt;<span class="title">customVariableName2</span>&gt;</span>section2<span class="tag">&lt;/<span class="title">customVariableName2</span>&gt;</span>
+            <span class="tag">&lt;<span class="title">customVariableValue2</span>&gt;</span>second<span class="tag">&lt;/<span class="title">customVariableValue2</span>&gt;</span>
+        <span class="tag">&lt;/<span class="title">row</span>&gt;</span>
+    <span class="tag">&lt;/<span class="title">customVariables</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">timeSpent</span>&gt;</span>30<span class="tag">&lt;/<span class="title">timeSpent</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">timeSpentPretty</span>&gt;</span>30 秒<span class="tag">&lt;/<span class="title">timeSpentPretty</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">icon</span>/&gt;</span>
+<span class="tag">&lt;/<span class="title">row</span>&gt;</span>
+<span class="tag">&lt;<span class="title">row</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">type</span>&gt;</span>action<span class="tag">&lt;/<span class="title">type</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">url</span>&gt;</span>http://localhost/test/<span class="tag">&lt;/<span class="title">url</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">pageTitle</span>/&gt;</span>
+    <span class="tag">&lt;<span class="title">pageIdAction</span>&gt;</span>11<span class="tag">&lt;/<span class="title">pageIdAction</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">pageId</span>&gt;</span>9102<span class="tag">&lt;/<span class="title">pageId</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">serverTimePretty</span>&gt;</span>周六 25 五月 14:00:08<span class="tag">&lt;/<span class="title">serverTimePretty</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">customVariables</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">row</span>&gt;</span>
+            <span class="tag">&lt;<span class="title">customVariableName1</span>&gt;</span>section1
+            <span class="tag">&lt;/<span class="title">customVariableName1</span>&gt;</span>
+            <span class="tag">&lt;<span class="title">customVariableValue1</span>&gt;</span>first
+            <span class="tag">&lt;/<span class="title">customVariableValue1</span>&gt;</span>
+        <span class="tag">&lt;/<span class="title">row</span>&gt;</span>
+        <span class="tag">&lt;<span class="title">row</span>&gt;</span>
+            <span class="tag">&lt;<span class="title">customVariableName2</span>&gt;</span>section2<span class="tag">&lt;/<span class="title">customVariableName2</span>&gt;</span>
+            <span class="tag">&lt;<span class="title">customVariableValue2</span>&gt;</span>second<span class="tag">&lt;/<span class="title">customVariableValue2</span>&gt;</span>
+        <span class="tag">&lt;/<span class="title">row</span>&gt;</span>
+    <span class="tag">&lt;/<span class="title">customVariables</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">timeSpent</span>&gt;</span>42<span class="tag">&lt;/<span class="title">timeSpent</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">timeSpentPretty</span>&gt;</span>42 秒<span class="tag">&lt;/<span class="title">timeSpentPretty</span>&gt;</span>
+    <span class="tag">&lt;<span class="title">icon</span>/&gt;</span>
+<span class="tag">&lt;/<span class="title">row</span>&gt;</span>
+</code></pre><p>可以看到时间上是错位了的= =,然后翻源代码,可以看到一个循环外加一个 注释</p>
+<pre><code><span class="comment">// set the time spent for this action (which is the timeSpentRef of the next action)</span>
+<span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="variable">$actionDetails</span>[<span class="variable">$actionIdx</span> + <span class="number">1</span>]))
+{
+    <span class="variable">$actionDetail</span>[<span class="string">'timeSpent'</span>] = <span class="variable">$actionDetails</span>[<span class="variable">$actionIdx</span> + <span class="number">1</span>][<span class="string">'timeSpentRef'</span>];
+    <span class="variable">$actionDetail</span>[<span class="string">'timeSpentPretty'</span>] = Piwik::getPrettyTimeFromSeconds(<span class="variable">$actionDetail</span>[<span class="string">'timeSpent'</span>]);
+
+}
+</code></pre><p>= =..也就是说,每次储存的时间长度是下一个动作的时间,这就很奇怪了.</p>
+<p>另外,这套系统还有一些很不注意的地方,例如<br>数据整理结束以后,usort($actions, array($this, ‘sortByServerTime’));按照ServerTime来对所有数据进行排序<br>这样就有个很愚蠢的问题,如果有人同时访问了一个页面,那么时间戳是相同的,PageID会在访问的时候被确定<br>就会出现以下的问题..所以我很不明白既然都已经根据访问次序给了PageID了为什么不直接用PageID排序反而是用时间戳排序,再说了,就算用时间戳排序,难道不会在时间戳相同的情况下用PageID排序么?</p>
+<pre><code><span class="tag">&lt;<span class="title">row</span>&gt;</span>
+<span class="tag">&lt;<span class="title">pageId</span>&gt;</span>9100<span class="tag">&lt;/<span class="title">pageId</span>&gt;</span>
+<span class="tag">&lt;<span class="title">serverTimePretty</span>&gt;</span>周六 25 五月 13:59:37<span class="tag">&lt;/<span class="title">serverTimePretty</span>&gt;</span>
+<span class="tag">&lt;/<span class="title">row</span>&gt;</span>
+<span class="tag">&lt;<span class="title">row</span>&gt;</span>
+<span class="tag">&lt;<span class="title">pageId</span>&gt;</span>9099<span class="tag">&lt;/<span class="title">pageId</span>&gt;</span>
+<span class="tag">&lt;<span class="title">serverTimePretty</span>&gt;</span>周六 25 五月 13:59:37<span class="tag">&lt;/<span class="title">serverTimePretty</span>&gt;</span>
+<span class="tag">&lt;/<span class="title">row</span>&gt;</span>
+</code></pre>
+        
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </div>
+  </div>
+
+
+    
+      
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              <a class="post-title-link" href="/2013/05/03/cycling_review/">
+                骑行2012
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2013-05-03
+        </span>
+
+        
+
+        
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <h1 id="骑行手记">骑行手记</h1><p>一直想找个时间回顾一下我的骑行历程,但是,从去年拖到现在,不是没有时间,就是想不到怎么写,这篇东西陆陆续续写了十天,都不知道怎么吐槽自己了.</p>
+<hr>
+<h2 id="漫漫长路">漫漫长路</h2><p>去年9月,当暑假的气氛还未完全褪去,校园里满满穿着军装的新生攻略饭堂的时候,我购入了人生中第一辆的山地车.也是从此时开始,我成了坚定的山马党.无论折叠那优越的便携性也无论公路那无比的速度.我对山马的憧憬可以追溯到小学.当时学校离家6公里,对于当时身高未足160的我来说这是一段无比漫长的道路,尽管如此,我还是尝试过走路回家,一走就是一个半小时,而且以此为乐.直到有一天,同学说:”我们交换一下,我把单车借你,你骑回去我搭车回去”.然后我第一次尝试到了骑行的快感.初中那时,我对父母说,我以后骑车上学吧,父母一句太危险没必要将这个提议压了下去,我只能偶尔向同学借车绕着莲花山,绕着笔架山转圈而已.到高中时,我已经没有这种愿望,因为住宿生活的到来,新环境的压力,我把一切都抛到了脑后.</p>
+<p>在终于对大学厌倦的大二开学的时候,我决定我再也不要呆在这个荒岛上默默度日了,但是我没有勇气拿着父母的钱颓然度日,更没有勇气休学,来个GAP YEAR,我决定了我要走出荒岛,然后就没有然后了.或许是因为我买车的目的就是为了离开这座荒岛,所以我的在试骑之后很快就骑向了岛外的大千世界.</p>
+<h2 id="孤独的旅程">孤独的旅程</h2><blockquote>
+<p>2012年9月23日 大夫山</p>
+</blockquote>
+<p>我的第一站是大夫山,一座我骑完之后深感其不能称之为山而应称之为土包的”山”.那也是我第一次坐船,作为一个生活在海滨城市的人,第一次坐船居然是坐渡轮.9点出发,到了大夫山12点,为什么这20公里我走了3个小时?因为等船花了大半个小时,还有走错路,还有看地图等卫星导航.我第一次出行就遇到了一个来自深圳美的的员工,和我骑着一样的勇士,然后我前去搭讪,一拍即合,绕着那座平坦的土包骑了不知道多少圈,聊天南地北.分别之后,意犹未尽,然后我决定走向北方,奔向五山,回去的时候,两块电池都用完了,我又在海珠迷路了,那个道路建设我已经无力吐槽的地方.后来我就冲上了环城高速,成功找到了回家的路.第一次的骑行走了将近120KM,喝了600Ml的水8只.</p>
+<blockquote>
+<p>2012年9月29日&amp;2012年10月6日 深圳</p>
+</blockquote>
+<p>瞒着父母骑回深圳,先斩后奏.总里程:140KM*2.其实广州到深圳真没那么远,但是每次都遇到一些不可抗力因素导致我多走了15公里-20公里的路.由于翘了一天课加上中秋和国庆的长假,我背上了笔记本前行,因此一路走的很痛苦,尤其是背部无法完全需要伸直,而且笔记本又重(15.6寸立显颓势).途径我遇到过最烂并且现在感觉还是最烂的路:S238和S356.我也遇到了我经历的最凶险的公路:北环大道,在我不小心上了高速三次以后,我还是觉得,没有任何高速能比深圳这条交通干道更加危险.</p>
+<p><img src="../../../../person/img/under_construction.jpg" alt="s356_under_construction"></p>
+<blockquote>
+<p>2012年10月20日 珠海 160KM+168KM.</p>
+</blockquote>
+<p>我从来就不是一个循规蹈矩的人,即使google地图告诉我,如果我走S111,那么我去珠海到达中大只有110公里而已.我绕了很多路,走了很多不同的地方,看了很多不一样的人,不一样的风光.至今,到珠海的的路上那些无数的桥还深深留在脑海里.我先去了顺德南医科大学,在大学门口等待的时候,见到了很多从大学城过来的人,有一样骑行过来的,也有搭车过来的,虽然目的相仿,都是在等,但是他们是人生赢家,都在等女朋友,短短十几分钟从我眼前走过了十几对久违相见的情侣,依偎前行.一路上路过了很多学校,什么上网小学,广药,暨大,中大.珠海很美,远比我见过的城市都美,一望无际的海滩,宽敞的公路,蔚蓝的天空,清新的空气,还有成群的车友出没,如果有机会,一定要去珠海工作,骑遍珠海每一个角落.回来的路上,绕远路去了中山,遇到一对很热情的夫妇,一起骑了两个小时,让我少走了不少弯路,后来上了城桂公路,遇到了无数骑山路的车友,感受到原来有那么多人骑车的.</p>
+<p><img src="../../../../person/img/zhuhai.jpg" alt="zhuhai"></p>
+<blockquote>
+<p>2012年10月27日 海鸥岛 </p>
+</blockquote>
+<p>海鸥岛是没有海鸥的,全是骗人的,不过海鸥岛上有环岛的绿道,当然继承了我大吃省绿道一贯的风格,随便一条路,只要插上一个牌子就是绿道,实在太丑的路就不要了,有钱就可以先建那么一点绿道,铺完走人,以后再也不用管理.环岛绿道相比珠海的海狸岛,差了两个等级不止.不但中断很多,而且绿道久未修了,牌子的颜色都已经发黄,总不能叫它黄道吧?</p>
+<p><img src="../../../../person/img/haioudao.jpg" alt="dahuang"></p>
+<hr>
+<blockquote>
+<p>然后2012年10月31日,总里程超过1000公里,距离买车不过50天而已.</p>
+</blockquote>
+<hr>
+<blockquote>
+<p>2012年11月4日 东莞广东医学院&amp;松山湖 185KM.</p>
+</blockquote>
+<p>GOOGLE MAP一直作为我御用的导航软件,无论什么时候,只要地图在手,连东南西北都无法辨认的我就不怕迷路,在我的SP上,它一直矜矜业业的工作着,而且很省流量,即使WM的版本无法缓存地图,我骑上整整一天也不过消耗7.8M而已,而且两块电池可以撑上14小时,相比android这种电老虎,流量杀手来说太优秀了(虽然有离线地图,但是如果不开后台限制数据的话,流量一样走的飞快).当然google地图曾经带我穿过封闭式工厂,翻越栏杆然后转向,翻山越岭最后压根没路的,之前还有早就断掉的公路,泥沙路.</p>
+<h2 id="无奈的终焉">无奈的终焉</h2><blockquote>
+<p>2012年12月8日 花都 </p>
+</blockquote>
+<p>第一次出了车祸.虽然以前也遇到过一些小小的事件,例如一不小心撞到了前面摩托车的后轮然后被大叔瞪了,例如抓着水瓶然后一不小心摔车刷伤膝盖然后几天之后完全没事了,例如被卡车勾到书包然后被拖了十几米然后被众多路人把卡车拦下来但是毫发无损.而花都之行却是我第一次真正的受伤-骨折.食指骨折,为此我付出了将近10个星期的时间债,再也没有出去骑车.固定了6个星期然后食指无法弯曲,受伤以后将近3个月才恢复正常.当然也只是功能正常,它永远的弯了!!! </p>
+<blockquote>
+<p>然后我的2012就这样结束了,在手指断掉的隐隐作痛中过去了.就这样度过了我十九岁最后的青春.</p>
+</blockquote>
+
+        
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </div>
+  </div>
+
+
+    
+      
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              <a class="post-title-link" href="/2013/04/26/how_the_qrcode_encode/">
+                QRCODE介绍与编码简介
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2013-04-26
+        </span>
+
+        
+
+        
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <h1 id="初涉二维码编码原理">初涉二维码编码原理</h1><hr>
+<h2 id="基础常识">基础常识</h2><p>二维码发源于日本<br>有四种规范(参考ISO/IEC 18004:2006(E))</p>
+<blockquote>
+<p>QRCode Model 1,QRCode Model 2,QRCode 2005,The Micro QRCode</p>
+</blockquote>
+<p>Model1是最早的版本,数据量小而且在图像变形的时候无法读取</p>
+<p>Model2是增强版本,增加了对齐位</p>
+<p> <img src="http://i.imgur.com/3641QoR.png" alt="model1"> <img src="http://i.imgur.com/zXE7svr.png" alt="model2"> </p>
+<p>QRCode 2005 和Model2完全兼容,只是增加了一些其他特性.(实在不知道怎么翻译).Model2可以被本规格译码器直接译码.,有1-40号的版本.是主流二维码标准<br>The Micro QRCode 只需要左上角一个寻象图形(1:1:3:1:1)和2码元的留白</p>
+<blockquote>
+<blockquote>
+<p><img src="http://i.imgur.com/2DvKAbe.png" alt="micro"> MICRO QR</p>
+</blockquote>
+</blockquote>
+<p>当然时代在发展,而且有不属于规范中的二维码,根据<a href="http://www.qrcode.com/en/codes/" target="_blank" rel="external">QRCODE官网</a> 如果将MODEL 1 2分开,有共计6种规格,(温馨提示,请不要选择中文版本,中文版本不全,选择英日韩均可).分别是MODEL 1/2,Micro QR,IQR,SQRC,logoQ.</p>
+<p>下面简单说说QRCode 2005的新特性</p>
+<ol>
+<li>版本16以上的QRCODE支持结构链接,也就是一个数据文件拆分成多个QR码序列</li>
+<li>支持更多的字符集,例如Arabic,Cyrillic, Greek</li>
+<li>支持颜色反转,将黑白反转依然可以读取,例如b(经测试,不少二维码读取软件都不支持这样的读取)</li>
+<li>支持图像水平反转,例如下图的c</li>
+</ol>
+<p><img src="http://i.imgur.com/4YRLkPE.png" alt="Imgur"></p>
+<p>颜色反转这种功能非常有用,例如你的电池,你的充电器,不少都是黑色的,上面有印着白色二维码(例如骚尼的充电器),请不要吐槽为什么不贴张白色贴纸然后用黑色二维码,或者是原本那塑料和包装纸就是白色的(不是所有的充电器都是水果牌</p>
+<p><img src="http://i.imgur.com/QzyRx5o.png" alt="ac"> <img src="http://i.imgur.com/HZxq2vR.png" alt="battery"></p>
+<h2 id="基本结构">基本结构</h2><hr>
+<p>若无特殊说明,一切基于QRCODE 2005说明(除了特殊说明,Model 2一般和QRCODE 2005相同)<br>QRCode版本1的码元数目为21<em> 21(码元就是一个bit,黑点为1,白点为0,不考虑颜色反转).版本N的码元边长为17+4</em>N.也就是说每增加一个版本,边长增加4.</p>
+<p><img src="http://i.imgur.com/gZXjhQP.png" alt="QR_Character_Placement.png"></p>
+<h4 id="寻象图形_Finder_Pattern">寻象图形 Finder Pattern</h4><p>寻象图形比例为1:1:3:1:1.无论何种规格,均为7个码元,颜色分别是黑白黑白黑,另外,寻象图形周围有1个码元宽度的分隔符Separator,全部为白色,如下图</p>
+<p><img src="http://i.imgur.com/QO7iWqV.gif" alt="finder_pattern.png"></p>
+<h4 id="定位图形_Timing_pattern">定位图形 Timing pattern</h4><p>水平和垂直定位图形均宽1个码元(one module wide),黑白相间,在两个寻象图形之间,与其中一边对齐.定位图形的意义在于二维码初次检测的时候便于确定两个寻象图形的距离,以计算该二维码的版本号.</p>
+<h4 id="校正图形_Alignment_patterns">校正图形 Alignment patterns</h4><p>一个5*5的方块,外围的一圈黑色加上中心的一个黑色码元.版本2以上均有.(所以上方的图没有校正图形)</p>
+<p><img src="http://i.imgur.com/AM1lTo6.png" alt="preview"></p>
+<h2 id="编码">编码</h2><hr>
+<ol>
+<li>数据分析 分析数据类型确定编码方式,可以进行混编,同时确定数据量,如果没有指定版本,那么按照当前纠正等级所匹配的最小版本来填充数据.</li>
+<li>数据编码 数据转换成8bit流,并且在模式段前加入模式指示符(如果模式混编需要加入指定模式符)</li>
+<li>纠错编码 按照标准将数据流分块,通过RS码进行校验编码.生成纠错码字(一般为系统码)</li>
+<li>构造最终信息 按照标准将bit流放入数据块中,未填充完全则加入剩余位</li>
+<li>布置模块 放入寻象图形,分隔符,校正图形,定位图形和码字(8bit)</li>
+<li>掩模 根据4个罚分标准评价结果取掩模</li>
+<li>放入格式信息(掩模,纠错级别).一些版本(&gt;=7)还需要放入版本信息.</li>
+</ol>
+<p><em>p.s. 系统码指信息位和校验位分别存放,还有对应的非系统码,均可以在QRCode中使用,非系统码的意义在于重新调整区域信息,以达到自己想要的图形,相信说道这里已经有人知道非系统码可以用来做什么了</em></p>
+<p> ~~6.4.2.1 ECI Designator 暂时没有全看懂,先说一下懂的东西,ECI扩展和ECI指定符暂时不会= = ~~</p>
+<p>ECI可以简单认为是后续数据的编码模式,不过包含着其他数据.如果一个数据流最开始不是缺省ECI(0111)那么随后每一段(segment)最前端都需要有ECI标头,如果以缺省的ECI开始，位流的开头为第一个模式的指示符。</p>
+<p><strong>最终的位串由模式指示符（4位）,字符计数指示符(Character Count Indicator),数据位流组成.</strong></p>
+<pre><code>ECI    <span class="number">0111</span>
+数字    <span class="number">0001</span>
+字母数字    <span class="number">0010</span>
+<span class="number">8</span>位字节    <span class="number">0100</span>
+日本汉字    <span class="number">1000</span>
+中国汉字    <span class="number">1101</span>
+结构链接    <span class="number">0011</span>
+F<span class="label">NC1</span> <span class="number">0101</span> <span class="comment">(第一位置)</span><span class="number">1001</span> <span class="comment">(第二位置)</span><span class="comment">(不懂FNC1,别问我= =)</span>
+终止符 <span class="number">0000</span>
+</code></pre><p>字符计数指示符用来表明随后的字符有多少位,字符计数指示符的长度可以查表得出.</p>
+<p><img src="http://i.imgur.com/ki2QtQd.png" alt="character count indicator"></p>
+<p>注:中文汉字和日文汉字相同</p>
+<h4 id="数字模式">数字模式</h4><p>十进制数字,3个一组编码成10bit.</p>
+<p>例如1-H版本.01234567分组012 345 67.那么</p>
+<pre><code>012-&gt;<span class="number">0000001100</span>
+345-&gt;<span class="number">0101011001</span>
+67-&gt;<span class="number">1000011</span>
+</code></pre><p>可以看到,如果数字只剩下3个,则用7bit编码,如果只剩下一个,则用4位编码.2^10=1024,可以表示0-999,2^7=128,用于表示0-99,2^4=16,用于表示0-9.<br>使用率将近97%,所以储存的数据量相比其他的二维码要大不少.</p>
+<p>好,然后继续编码.数字的模式指示符为0001,01234567一共8个,根据查表字符计数指示符,1-9版本的数字,字符计数指示符都是10,对8进行编码,得到0000001000.</p>
+<p>所以增加了ECI标头的最终数据为0001 0000001000 0000001100 0101011001 1000011</p>
+<h4 id="数字字母模式">数字字母模式</h4><p>两位一组编码成11bit</p>
+<p><img src="http://i.imgur.com/vvgfuzI.png" alt="alphanumeric"></p>
+<p>本模式拥有0-9,A-Z的 <strong>大写</strong> 和少数符号组成,一共45种.因此对于一个字符串AB,其结果为45A+B的二进制,最大恰好11位.2025种组合对应2048,利用率将近99%.以下为示例</p>
+<pre><code>AC-42
+
+AC-42→(<span class="number">10,12,41,4</span>,2)
+(<span class="number">10,12)10*45</span>+<span class="number">12→462→00</span><span class="number">111001110</span>
+(<span class="number">41,4)41*45</span>+<span class="number">4→1849→111</span><span class="number">00111001</span>
+(2)→<span class="number">2→000010</span>
+
+模式指示符:0010
+字符数字:5 ---&gt;查表得9位--&gt;5-&gt;<span class="number">000000101</span>
+结果:<span class="number">0010 00000</span><span class="number">0101 001110</span><span class="number">01110 111001</span><span class="number">11001 00001</span>0
+</code></pre><h4 id="字节流">字节流</h4><p>直接8bit一个码字</p>
+<h4 id="汉字">汉字</h4><p>中文汉字的编码,需要由日文编码JIS X 0208的值转换而来,太繁琐了,只能请参见各种论文了.</p>
+<h3 id="补足余位">补足余位</h3><p>当然,最终完成编码的时候还需要在后面补上0000这个终止符,这个终止符如果剩余位数不足4位,可以截短,如果大于等于4位,均补0000.补全结束以后,如果该编码不足长度能整除8,那么继续补0,补齐8位.随后会放上 <a href="http://www.thonky.com/qr-code-tutorial/data-encoding/#step-4-add-the-character-count-indicator" target="_blank" rel="external">thonky</a>的例子.</p>
+<p>补全以后如果编码还是太短未到当前版本要求容量,那就增加<strong>11101100 00010001</strong>直到填满容量.十进制是236和17,至此编码数据结束,可以开始编码纠错模块.</p>
+<pre><code>在1-Q版本中编码 HELLO WORLD这11个字母.
+查表可知,1-Q一共有13个码字,总容量<span class="number">13*8=104</span>bit.
+模式指示符: 0010
+字符位数指示符(9位): <span class="number">00001011</span>(十进制数字是11)
+数据编码: <span class="number">01100001011</span> <span class="number">01111000110</span> <span class="number">10001011100 101</span><span class="number">10111000 100</span><span class="number">11010100 00</span>1101
+以上编码总计74位.由于未达到总容量,所以补全0000终止符(如果以上编码102位,那么就只需要补00)
+终止符: 0000
+
+以上编码结束后,需要分成8bit一个码字
+<span class="number">00100000 01</span><span class="number">011011 00</span><span class="number">001011 01</span><span class="number">111000 110100</span><span class="number">01 01110010</span> <span class="number">11011100 01</span><span class="number">001101 01000</span>011      010000
+发现最后一个码字只有6位,那么补全到<span class="number">8位0100000</span>
+由于容量目前是<span class="number">74+4+2=80</span>,那么需要补全到104还需要24bit.填充<span class="number">11101100 00</span>010001.
+<span class="number">00100000 01</span><span class="number">011011 00</span><span class="number">001011 01</span><span class="number">111000 110100</span><span class="number">01 01110010</span> <span class="number">11011100 01</span><span class="number">001101 01000</span><span class="number">011 01000</span>000  <span class="number">11101100 00</span><span class="number">010001 111</span>01100
+</code></pre><p>编码结束.</p>
+<h2 id="纠错编码">纠错编码</h2><hr>
+<p>纠错一共有4个等级,恢复容量分别是<strong>L 7% M 15% Q 25 % H 30%</strong></p>
+<p>恢复容量的计算:如果初始有100个bit,我们希望能够恢复其中50个bit,那么这50个bit需要2倍的bit才能够纠错(具体请查阅有关论文!),所以现在一共有100+50*2=200bit.恢复容量=50/200=25%.也就是Q级.</p>
+<p>纠错码字可以纠正两种类型的错误，<strong>拒读错误</strong>（错误码字的位置已知,既无法扫描到或者无法译码,例如缺失了某一角）和<strong>替代错误</strong>（错误码字位置未知,既读取到了该模块,但是由于奇奇怪怪的问题导导致黑读成了白,白读成了黑）。</p>
+<p>首先,你要知道什么是多项式除法,例如3x^2+x-1被x+1除,相信学过高中数学的都会.<br>然后,你要知道什么是<strong>The Galois Field伽罗瓦域</strong>,也叫有限域.这里取GF(2^8),将数字运算限定在8位数里面.<br>伽罗瓦域需要<strong>模二取余</strong>(也就是XOR),并且以绝对值进行运算<br>例如1+1=2%2=0,1 ^1=0(这个是抑或XOR).0+1=1;1 ^0=1;</p>
+<p>加罗瓦域2^8以<strong>100011101</strong> ( 285)表示主模块多项式x^8+x^4+x^3+x^2+1,用这个数字对超出255的数字进行XOR. 2^8=256^285=29</p>
+<p>好了= =,如果连续两个星期熬夜到三四点的我还能活多几个星期的话,我会把这一段补完,重开一篇新的文章的…不然直接看原文<a href="http://www.thonky.com/qr-code-tutorial/error-correction-coding/" target="_blank" rel="external">error-correction-coding</a>吧 </p>
+<p>跳过如果RS编码那一块,接着就是如何排列这一些数据块.又是查表,例如查询版本5-H.</p>
+<pre><code><span class="number">5</span>    H    <span class="number">88</span>    <span class="number">2</span>    <span class="comment">(33,11,11)</span>
+                     <span class="number">2</span>    <span class="comment">(33,12,11)</span>
+</code></pre><p>(c, k, r): c =码字总数    k =数据码字数    r =纠错容量</p>
+<p>计算公式:c=k+2r.这里也就是之前所说的纠错一个bit需要2bit.</p>
+<p>5-H版本纠错码字数为88(这个数字可以由r和块数计算出来,这里是4*2r=88),纠错块数为4,分成前2个和后2个.分成不同大小的块数是因为总码字无法直接整除12.</p>
+<blockquote>
+<blockquote>
+<p>块1 D1    D2    D3   …   D11          E1    E2    … E22</p>
+<p>块2 D12 D13 D14 …  D22          E23 E24 … E44</p>
+<p>块3 D23 D24 D25 …  D33 D34  E45 E46 … E66</p>
+<p>块4 D35 D36 D37 …  D45 D46  E67 E68 … E88</p>
+</blockquote>
+</blockquote>
+<p>版本5-H符号的最终码字序列为D1, D12, D23, D35, D2, D13, D24, D36, … D11, D22, D33, D45, D34, D46, E1, E23, E45, E67, E2, E24, E46, E68, … E22, E44, E66, E88。如果需要，在最后的码字后面加上剩余位（0）。</p>
+<p>由于找不到5-H的编码图形,用GIMP自己画会死的= =,只好用其他版本的了.下面这个图形,对于码字,排列顺序是从左到右,以蛇行方式排列,对于bit,实际上是以z字形不断扩展的.</p>
+<p><img src="http://i.imgur.com/MZfX6PB.png" alt=""></p>
+<h2 id="掩模">掩模</h2><hr>
+<p>掩模要事先除去功能图形,但是评分却是对整个图形进行的.一共有8种掩模,掩模的编号对二维码解码来说可以说是最重要的,如果无法正确识别掩模就无法读取整个图形的信息.</p>
+<p><strong>罚分标准</strong>:不仅仅是使整个图形黑白比例接近1:1,还有其余的判分标准.</p>
+<pre><code>行/列中相临的模块的颜色相同
+模块块的颜色相同--模块数 = <span class="params">(<span class="number">5</span> + i)</span>                                         罚分:N1 + i
+颜色相同的模块组成<span class="built_in">*</span>块-块尺寸 = m×n                                  罚分:N2× <span class="params">(m - <span class="number">1</span>)</span>×<span class="params">(n - <span class="number">1</span>)</span>
+在行/纵列中出现<span class="number">1</span>:<span class="number">1</span>:<span class="number">3</span>:<span class="number">1</span>:<span class="number">1</span>图形                                                 罚分:N3
+整个符号中深色模块的比率-<span class="number">50</span>±<span class="params">(<span class="number">5</span>×k)</span><span class="built_in">%</span> 到 <span class="number">50</span>±<span class="params">(<span class="number">5</span>×<span class="params">(k + <span class="number">1</span>)</span>)</span><span class="built_in">%</span>   罚分:N4×k
+</code></pre><p>N1到N4为对符合以上特征所罚分数的权重（N1=3，N2=3，N3=40，N4=10）</p>
+<p>选择掩模结果中罚分最低的掩模图形用于符号掩模</p>
+<p><img src="http://i.imgur.com/sXtObKd.png" alt="xor"></p>
+<h3 id="格式信息">格式信息</h3><p>格式信息为15位，其中有5个数据位，10个是用BCH（15，5）编码计算得到的纠错位。</p>
+<p>格式信息一共有两份,一份排布在左上角的寻象图形外围(需要去掉timing pattern交叉的两个点,恰好15位),另外一份拆分成两个部分,一部分在左下角寻象图形右侧,从低到高为0-7,另一部分在右上角寻象图形下方,有后7位,从右至左8-15</p>
+<p><strong>纠错等级指示符(1-2位):</strong></p>
+<p>L:01            M:00            Q:11            H:10</p>
+<p><strong>掩模图形指示符(3-5位):</strong><br>000-111</p>
+<p>将15位格式信息与掩模图形101010000010010进行XOR运算</p>
+<p><strong>L:11</strong>            <strong>M:10</strong>            <strong>Q:01</strong>            <strong>H:00</strong></p>
+<p>这个就是我们肉眼所见的能直观判断该图的纠错级别的符号.</p>
+<p><strong>版本信息</strong></p>
+<p>版本信息为18位，其中，6位数据位，通过BCH（18，6）编码计算出12个纠错位,放置在版本信息位.</p>
+<p>只有版本7～40的符号包含版本信息</p>
+<hr>
+<p>至此整个编码过程结束.各种个性化的二维码生成有机会再慢慢讲,当然前提是我看懂了那些论文和算法们.</p>
+<hr>
+<p>部分图片,资料取自维基百科</p>
+<p>部分图片,资料取自专利书ISO/IEC 18004:2006(E)</p>
+<p>部分来源  <a href="http://www.thonky.com/qr-code-tutorial/data-encoding/#step-4-add-the-character-count-indicator" target="_blank" rel="external">thonky</a></p>
+
+        
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </div>
+  </div>
+
+
+    
+      
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              <a class="post-title-link" href="/2012/12/26/madoka/">
+                魔法少女小圆
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2012-12-26
+        </span>
+
+        
+
+        
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <h2 id="魔法少女小圆">魔法少女小圆</h2><p><img src="http://i.imgur.com/gL1wc.jpg" alt="madoka"></p>
+<p>如果说我用什么来判断时间的流逝,那就是每年必来的新番季.历经春夏秋冬两个轮回之后,我终于把小圆补完了.其实当我还在高三挣扎的时候,已经从宿友口中得知小圆,并且看了学姐被吃掉,身体掉下来的那一瞬间.在那以后,每当听见别人赞扬小圆的时候,我当时以为学姐的死就是小圆的全部,并且对小圆很不屑,就像我们都惊异于皇冠的神转折但是还是坚定的人为皇冠只是个渣番一样.我一直以为小圆是不值得补的.(当时错杀的还有石头门)</p>
+<p>一年以后,我补完了石头门,被okarin一次一次的无力所震撼,又一年,我补完了小圆,又一次被这种无力的抗争所打动.</p>
+<p>homura为了能够拯救madoka不断的倒退时间,去到平行世界的另外一端,一次一次的陪伴小圆,一次一次的绝望,最后变得冷漠,但是依然想去让小圆摆脱必死的命运,对,这里的homura可以替换成okarin,madoka换成mayuri和助手.又或者应该说这一幕更加像未来日记?应该说,能让我感动的,一个是勇往之前,无论什么艰难险阻都克服的热血意外,另外一个就是无论如何都无法摆脱的无力但是却又依然坚持的那份精神(baka)了吧.不过,在这样不停的往复当中,真的不会后悔么,如果当初没有这样做就好了这样的感觉.虽然后悔本身就很不负责任,选择了却不去承担,本来就是很狡猾的事情(觉得这句句子很奇怪的自觉替换成日语来读,然后就很顺口了).也许穿越时空改变世界线本身就是很自私的行为也说不定,为了自己能够让世界照着自己所想象的发展,所以要跨越世界线去寻找自己所期待的世界,遗弃自己所存在的世界线,而去到另外的世界线,如果抱着失败也没有关系最后再换一条线的感觉,那就太糟糕了,世界并不是可以自由选择的东西,而是选择了无论怎样都只能接受的世界.所以自由才成了这个时代的最强音吧,厌恶专政,厌恶独裁,期待民主,期待自由.尽管自由可能会带来好的坏的东西,最后承担这些的都是选择了他的我们而已,如果不好的东西就要再去改变他们,杨威利当初这么说的时候我也没能理解,不过慢慢的总算能理解为什么了.</p>
+<p>在一次一次的重复当中最后应该是会失去自我的吧,看到最后的时候我差点以为那只是过去的回忆而已,直到小圆最后站在homura的身前决定再一次称为魔法少女的时候,我才意识到这里是世界的主线.如果这次小圆没有站出来,homura的循环也会到此结束了,即使说了”何度でも缲り返す”,但是最后还是要接受命运的无奈真是让人热血沸腾呢.”就是因为这个我才这么喜欢人类的说”.</p>
+<blockquote>
+<p>既然要实现他人的愿望，就更应该搞清楚自己追求的是什么，你是希望他能实现你的梦想，还是想借实现他的梦想施恩于他呢。要是没弄清楚这一点，迟早有一天你会后悔的。</p>
+</blockquote>
+<p>如果说魔法少女是从希望中诞生的话,魔女就是绝望的叹息.魔法少女的诞生存在这巨大的不合理,能够完成一个超乎世界规律的愿望,以此来换取灵魂,将灵魂独立出来.但是世界始终是公平的,希望的诞生也伴随着绝望.一面期待着拯救世人,另外一面确是杀戮的化身.用性命来换取的愿望,不知道有多少人有呢?至少我没有什么牺牲自己也要完成的愿望,我只想就这样活下去而已,虽然没有目标,虽然有很多不满,但是也找不出不合理的地方,已经成为日常的东西连打破也需要很大的勇气才行.如果说这个愿望是为了别人的话,在我看来真的是很不值得吧,为了自己还能说是without compunction.为了别人的话,如果被别人背叛的话,那就会堕落到比任何人都要深的黑暗中去的,鹰之团团长,还有很多很多这样被背叛的人.</p>
+<blockquote>
+<p>嘛，一定是因为我们两个是笨蛋啦.对，幸福的笨蛋。其实也没什么稀奇的啦，那种就算拼上性命也想要实现的愿望，这个世上也一定有很多人怀抱着这些东西吧，所以找不到这种目标的我们，正好说明了我们不知道那样的痛苦，因为受到了太多的恩泽，所以变成了笨蛋啊 </p>
+<p>越是重复，就越是偏离你和我生活过的时间。心意也相互偏离，言语也渐渐无法相通，我想我大概早已迷路了。“要拯救你”这是我最初的心意，而到如今，这是最后留下的唯一路标了</p>
+</blockquote>
+<p>印象比较深刻的还有生命之树,魔女们,到处都洋溢着一阵EF+EVA的风格,小圆真是一部很值得称赞的作品呢.</p>
+
+        
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </div>
+  </div>
+
+
+    
+      
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              <a class="post-title-link" href="/2012/12/15/how_to_built_impress/">
+                impress.js使用小记
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2012-12-15
+        </span>
+
+        
+
+        
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <h1 id="前言">前言</h1><p>在偶然的机会下,接触到prezi这样一种展示工具,但是因为庞大的开发套件&amp;收费让我止步,幸运的是,找到了impress.js这样一种替代品,如此精简而又优秀的展示工具.impress.js需要搭配html+Css实现,尽管已经有两三个visual design tool,但是效果差强人意,唯一一个比较满意的就是markdown2impress.不过由于需要实现自己的网页风格,还是决定全部自己写.下面就介绍一个如何设计一个基于impress.js的网页/展示.</p>
+<hr>
+<blockquote>
+<p>首先还是先放官方demo以及我制作的presentation.</p>
+<p><a href="http://slixurd2.tk/person/presentation/presentation.html#/start-page" target="_blank" rel="external">demo-slixurd</a> 对内容感兴趣的一样可以进入<a href="http://slixurd2.tk/2012/12/14/opensource/" target="_blank" rel="external">OpenSource</a>查看以及下载</p>
+<p><a href="http://bartaz.github.com/impress.js/#/bored" target="_blank" rel="external">demo-official</a></p>
+</blockquote>
+<hr>
+<p>然后..一个JS如何实现一个网页呢?妈妈告诉我们,程序员们最重要的能力就是看源代码,所以当你下意识的点开查看源代码的时候,你已经开始迈出第一步了.原本想翻译作者的源代码的(因为作者把基本步骤都写在源代码里面了),不过看到已经有人翻译了,那二次劳动就免了,<a href="http://eyehere.net/2012/impress-js-chinese-course-tutorial/" target="_blank" rel="external">点击这里阅读eyehere的翻译</a> .鉴于网上的教程都是从一份英文教程翻译而来并且翻译的不知道如何评价.不过由于大体正确,我也没必要继续重复写,我就从另外的角度来讲好了.</p>
+<p>就如同作者所说的一样</p>
+<blockquote>
+<blockquote>
+<p>So if you want to build great presentation take a pencil and piece of paper. And turn off the computer.<br>Sketch, draw and write. Brainstorm your ideas on a paper. Try to build a mind-map of what you’d liketo present. It will get you closer and closer to the layout you’ll build later with impress.js.</p>
+</blockquote>
+</blockquote>
+<h2 id="布局">布局</h2><p><img src="http://i.imgur.com/h3frn.jpg" alt="impress"></p>
+<p>这是官方demo的布局.首先我们需要知道座标定位所需要的变量,impress.js一共提供了4个主要定位的参数(3d变换不算).</p>
+<blockquote>
+<p><code>data-x=&quot;3500&quot; //只要学过数学的都应该知道.这是直角座标系(装B的说法是-笛卡儿座标系)</code></p>
+<p><code>data-y=&quot;2100&quot; //但是方向不一样,y是以下为正方向的</code></p>
+<p><code>data-rotate=&quot;180&quot; //这个是旋转角度</code></p>
+<p><code>data-scale=&quot;6&quot;//这个是放大倍数</code></p>
+</blockquote>
+<p>定位点均为该子页面未缩放及旋转前的左上角,所以我们可以在图上看到座标系的原点.(不是(0,0)标示的位置,而是黑色x轴那里.)我们需要为每一个页面做定位.所以设计在这里就显得很重要了.<br>倍数可以带小数,例如0.001,旋转角度可以是负数,也可以超过360(表示多次旋转),善用缩放和旋转是让presentation出彩的重要一环.所以,离开电脑,好好画一下布局,好好设计才是正道,像我这种做完以后都不敢放overview的千万不要学.</p>
+<h2 id="基本结构">基本结构</h2><p>我们直接看全局结构吧,以下是最小结构</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="doctype">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">link</span> <span class="attribute">href</span>=<span class="value">"css/impress-demo.css"</span> <span class="attribute">rel</span>=<span class="value">"stylesheet"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">head</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="title">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">div</span> <span class="attribute">id</span>=<span class="value">"impress"</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!--content start tag --&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="title">div</span> <span class="attribute">id</span>=<span class="value">"first"</span> <span class="attribute">class</span>=<span class="value">"step"</span> <span class="attribute">data-x</span>=<span class="value">"0"</span> <span class="attribute">data-y</span>=<span class="value">"0"</span> <span class="attribute">data-rotate</span>=<span class="value">"180"</span> <span class="attribute">data-scale</span>=<span class="value">"3"</span>&gt;</span></span><br><span class="line">	        <span class="tag">&lt;<span class="title">p</span>&gt;</span>the first try<span class="tag">&lt;/<span class="title">p</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="title">div</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!--end tag --&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="title">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"js/impress.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">script</span>&gt;</span><span class="ocaml">impress<span class="literal">()</span>.init<span class="literal">()</span>;</span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>作为一个网页必须的元素当然都是必须有的,例如最外层的<code>&lt;html&gt;</code>标签,然后其中的<code>&lt;head&gt;</code>和<code>&lt;body&gt;</code>两个标签.谈谈impress.js需要的东西.</p>
+<p>第一个:<code>&lt;script src=&quot;js/impress.js&quot;&gt;&lt;/script&gt;//链接js脚本</code></p>
+<p>第二个:<code>&lt;script&gt;impress().init();&lt;/script&gt;//这个也可以用他自带的其他api,不过一般init就足够了</code></p>
+<p>选择可有:<code>&lt;link href=&quot;css/impress-demo.css&quot; rel=&quot;stylesheet&quot; /&gt;</code></p>
+<p>script最好就是直接放在body结束标签前,否则有机率无法载入.css样式表根据自己需要修改,删除,增加.<br>其实实际上,如果想偷懒的话,直接在我所标示的content tag中间加内容就可以了.</p>
+<p>鉴于impress.js只支持chrome,safari,ff.所以做不支持的提示是很重要的,因此可以这么写<code>&lt;body class=&quot;impress-not-supported&quot;&gt;</code> 在能够支持的情况下,js会自动替换掉这个class(不信的话用chrome打开网页查看源代码,查看和直接阅读html的区别),无须担心.</p>
+<p>最重要的就是#impress这个id,只有查找到这个标签的时候,才会执行impress.js.所以在body标签之后就是一个<code>&lt;div id=&quot;impress&quot;&gt;&lt;/div&gt;</code>的标签,所有的内容都在里面.</p>
+<p>然后就进入了子页面,每一个页面都是div,必须有的元素是:.step,x,y.例如上述例子<br><code>&lt;div id=&quot;first&quot; class=&quot;step&quot; data-x=&quot;0&quot; data-y=&quot;0&quot; data-rotate=&quot;180&quot; data-scale=&quot;3&quot;&gt;</code><br>id是这个子页面的名称,最后仅仅只在地址栏有显示,是页面的唯一标识,所以不能够相同.然后是class=”step”同时我们也可以用class=”step slide”这种滑动页面,不过step是必须的,slide是可选的,同时如果自己有编写css,一样可以用自己的class.随后必需的是data-x,data-y.如果没有scale,默认为1,没有角度,默认为0;</p>
+<p>另外,作者提供了data-z这个参数,也就是所谓的3d-transform,标示在z轴的位置.效果如同一开始的概览图的12号.另外还有data-rotate-x data-rotate-y  data-rotate-z 这些参数,唯一不同的是,这些的参数的单位是度数.而x,y,z使用的是px.此外还有一些参数感觉没有什么用的就没有解释了,都可以在源代码的注释里找到.</p>
+<p>推荐源代码注释和本文都一起读,否则会觉得不知所以.关于css的部分我就不讲解了.我自己的presentation中最主要用的两个类是blurBG和pic.只是简单的圆角+背景+透明度+阴影的组合而已.可以自己尝试搭配,实在不会的话可以搭配各种代码审查(主流浏览器下按F12)查看css并做修改.</p>
+
+        
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </div>
+  </div>
+
+
+    
+  </div>
+
+  
+  <div class="pagination">
+    <a class="extend prev" rel="prev" href="/">&laquo;</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/3/">&raquo;</a>
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/aniki.png" alt="slixurd" />
+          <p class="site-author-name">slixurd</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">16</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">0</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">0</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/slixurd" target="_blank">Github</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/slixurd" target="_blank">Twitter</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+
+      </div>
+
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp; 
+  2015
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">slixurd</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.3"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.3"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.3" id="motion.global"></script>
+
+
+
+  <script type="text/javascript" src="/js/search-toggle.js"></script>
+
+  
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+  
+
+  
+
+
+
+
+  
+  
+
+</body>
+</html>

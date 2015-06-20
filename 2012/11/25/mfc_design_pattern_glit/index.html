@@ -1,0 +1,554 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.3"/>
+
+
+
+
+  <meta name="keywords" content="slixurd" />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.3" />
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    analytics: {
+      google: ''
+    },
+    sidebar: 'post'
+  };
+</script>
+
+
+
+
+  <title> MFC之设计模式分析 // slixurd </title>
+</head>
+
+<body>
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">slixurd</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<div class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/">
+            <i class="menu-item-icon icon-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            <i class="menu-item-icon icon-about"></i> <br />
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            <i class="menu-item-icon icon-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            <i class="menu-item-icon icon-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              MFC之设计模式分析
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2012-11-25
+        </span>
+
+        
+
+        
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <h1 id="MFC之设计模式分析">MFC之设计模式分析</h1><p><img src="http://i.imgur.com/xPk2f.jpg" alt="all"></p>
+<h2 id="程序的起点_命运之始">程序的起点 命运之始</h2><p>既然是C++程序,必然是由main函数(MFC中是WinMain)开始的.MFC作为一个成熟的软件框架,自然有着老练的一套-一个程序的实例需要有唯一的初始化(这里并不表示一个程序只能打开一次(即一个实例),仅能有一个实例这是通过自己重载initApplication实现的,但是这并不是其初衷).因此在程序尚未初始化的时候,就利用全局函数AfxGetApp取得该程序theApp的对象指针,然后用该指针指导后续界面,功能的加载.</p>
+<p>显然,<strong>这里用的是Singleton模式</strong>.不直接对类进行初始化转而利用函数获得该类的指针以保证仅有一个实例.</p>
+<blockquote>
+<p><code>pApp-&gt;InitApplication()</code></p>
+<p><code>pApp-&gt;InitInstance()</code></p>
+</blockquote>
+<p><img src="http://i.imgur.com/UPxku.jpg" alt="Imgur"></p>
+<p>当然这里的Singleton和我们一般学习的不太相同,但是这也体现了设计模式并不是照搬的这一重要特点.设计模式并不是传统的模式,更应该说是一种设计思想,其实现方式可以各种各样.一般的Singleton采用将构造函数设置为protected,这样就可以避免client类错误初始化(Java Script就没有,所以需要用其他方法),然后设计一个静态static的指针返回该类指针.MFC中使用的更类似JS的方法:<code>ASSERT(AfxGetThread() == NULL);</code>.即,如果<code>AfxGetThread() == NULL</code>,那么初始化,否则失败.<br>借由Singleton模式,对程序进行初始化.基本顺序是<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1. <span class="tag">pApp-</span>&gt;<span class="tag">InitInstance</span>()</span><br><span class="line">2. <span class="rule"><span class="attribute">CmyWinApp</span>:<span class="value">:<span class="function">InitInstance</span>() </span><br><span class="line">   &#123;</span><br><span class="line">	m_pMainWnd=new CMyFrameWnd</span></span>;</span><br><span class="line">   &#125;</span><br><span class="line">3. <span class="rule"><span class="attribute">CMyFrameWnd</span>:<span class="value">:<span class="function">Create</span>()&#123;<span class="function">CreateEx</span>()</span></span>;&#125;</span><br><span class="line">4. <span class="rule"><span class="attribute">CWnd</span>:<span class="value">:<span class="function">CreateEx</span>()&#123;<span class="function">PreCreateWindow</span>()</span></span>;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>由于有RTTI的原因,所以有很多地方就不需要用到常用的设计模式了,因为已经能够自己识别自己的类型,就不需要另外的抽象和实现的分离.简单说一下,RTTI分为两种,均用C风格的MACRO来编写,动态识别分别为<code>DECLARE_DYNAMIC</code>和 <code>IMPLEMENT_DYNAMIC</code>,动态创建为<code>DECLARE_DYNCREATE</code>和<code>IMPLEMENT_DYNCREATE</code>.这里主要讨论设计模式,所以对RTTI不作细究.当然RTTI贯穿整个MFC,是非常重要的元素.</p>
+<p>另外,并不仅仅只有pApp才用了Singleton模式,其他的例如CDC也有使用.</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">void CScribbleView<span class="value">::<span class="function">OnDraw</span>(CDC* pDC)</span><br><span class="line">&#123;</span><br><span class="line">	CScribbleDoc* pDoc = <span class="function">GetDocument</span>();</span></span><br><span class="line">	<span class="function">ASSERT_VALID</span>(pDoc)<span class="comment">//(此处和ASSERT功能类似,都是通过宏来判定指针是否NULL,需不需要初始化)</span></span><br><span class="line">	<span class="comment">//......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="Document-View_牵一发发动全身">Document-View 牵一发发动全身</h2><p>Document为模式中的subject,负责管理数据,view则是observer,用于显示document中的数据,使用者通过view看到document,也可以通过view改变document,view是document对外显示的接口.但是,view并不是独立的,而是保存在document frame的窗口内的.当document变化的时候,就会调用updateAllView进行对所有观察者的更新.因为在单个view下可以有多个数据的存在,所以此时需要一种一对多的依赖关系,并且在document的状态改变的时候,所有依赖它的对象都会得到消息并且更新.这也是observer模式的初衷.<br><img src="http://i.imgur.com/pZ37k.jpg" alt="observer2"></p>
+<p>后面根据具体代码分析.CFrameWnd(派生于CObject的类都可以接受消息,消息网路这里不讨论了)接受到系统发出的WM_CREATE消息,然后引发<code>CFrameWnd::OnCreate()-&gt;CFrameWnd::OnCreateHelper()-&gt;CFrameWnd::OnCreateClient()-&gt;CFrameWnd::CreateView()</code>;</p>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="literal">void</span> CFrameWnd<span class="tag">::CreateView</span>(CCreateContext<span class="subst">*</span> pContext,<span class="built_in">..</span>)</span><br><span class="line">&#123;</span><br><span class="line">	CWnd<span class="subst">*</span> pView<span class="subst">=</span>(CWnd<span class="subst">*</span> ) pContext<span class="subst">-&gt;</span>m_pNewViewClass<span class="subst">-&gt;</span>CreateObject();</span><br><span class="line">	pView<span class="subst">-&gt;</span>Create(<span class="attribute">...</span><span class="built_in">.</span>)</span><br><span class="line">	<span class="comment">//......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="http://i.imgur.com/8ZV9A.jpg" alt="observer"></p>
+<p>建立了多个View以后,CDocument有m_ViewList维护一系列的View.CFrameWnd仅有CView* m_pViewActive.指示现在正在活动的View.如果CDocument发生改变,就会调用UpdateAllViews()函数,使整个m_ViewList里面的View都update.这就是observer模式了.</p>
+<hr>
+<h2 id="文件serialization_永久机制">文件serialization 永久机制</h2><p>MFC之所以为应用程序框架,一个重要的特征就是能够将管理数据和负责数据显示的代码分离开来.看到这个特征,很自然的想起Bridge这样一种模式.正如无数设计模式的书上说的一样,设计模式是一种思想,它不立足于实现,一个很简单的例子:你一看到刚才那个特征,你就应该反应到这是桥接模式,但是你可以不知道桥接模式是怎么实现的,你只需要先知道概念,通过需求推导出模式,后面才是实现细节.这才是设计模式的根本.<br><img src="http://i.imgur.com/4ScY9.jpg" alt="bridge"></p>
+<p>CArchive和CFile的client类是CDocument.例如<code>CDocument::OnSaveDocument()</code>函数里面,</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">void CDocument<span class="value">::<span class="function">OnSaveDocument</span>(..)</span><br><span class="line">&#123;</span><br><span class="line">	CFile* pFile=<span class="function">GetFile</span>(...)</span><br><span class="line">	CArchive <span class="function">saveArchive</span>(pFile,CArchive::Store);</span></span><br><span class="line">	<span class="function">Serialize</span>(saveArchive);</span><br><span class="line">	<span class="comment">//......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>CArchive(实际上是文件缓冲区)和CFile之间的串行化设计采用了桥接模式.CArchive实现client需要的一系列接口(包括输入输出流的重载(&gt;&gt;&amp;&lt;&lt;)),数据则由CFile来操作,不考虑文件究竟以何种形式储存,数据的形式以及处理都是由CFile处理,实现了抽象于具体的分离.使得两个类CArchive和CFile可以在互不影响的情况下进行修改.所有需要写入文件读取文件的操作都在CArchive里面 ,它获得CFile作为参数,从而获取文件名,请求类型以及其他必要信息.</p>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2012/11/27/myboxybeta_design/">MyBoxyBeta 设计模式分析</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2012/11/24/design_pattern_first/">Design_pattern_first</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+
+    
+      <div class="comments" id="comments">
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/aniki.png" alt="slixurd" />
+          <p class="site-author-name">slixurd</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">16</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">0</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">0</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/slixurd" target="_blank">Github</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/slixurd" target="_blank">Twitter</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MFC之设计模式分析"><span class="nav-number">1.</span> <span class="nav-text">MFC之设计模式分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#程序的起点_命运之始"><span class="nav-number">1.1.</span> <span class="nav-text">程序的起点 命运之始</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Document-View_牵一发发动全身"><span class="nav-number">1.2.</span> <span class="nav-text">Document-View 牵一发发动全身</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件serialization_永久机制"><span class="nav-number">1.3.</span> <span class="nav-text">文件serialization 永久机制</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp; 
+  2015
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">slixurd</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.3"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.3"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.3" id="motion.global"></script>
+
+
+
+  <script type="text/javascript" src="/js/search-toggle.js"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.3" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      var $tocContent = $('.post-toc-content');
+      if (isDesktop() && CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+  
+
+  
+
+
+
+
+  
+  
+
+</body>
+</html>

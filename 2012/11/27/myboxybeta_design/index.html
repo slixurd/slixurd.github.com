@@ -1,0 +1,554 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.3"/>
+
+
+
+
+  <meta name="keywords" content="slixurd" />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.3" />
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    analytics: {
+      google: ''
+    },
+    sidebar: 'post'
+  };
+</script>
+
+
+
+
+  <title> MyBoxyBeta 设计模式分析 // slixurd </title>
+</head>
+
+<body>
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">slixurd</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<div class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/">
+            <i class="menu-item-icon icon-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            <i class="menu-item-icon icon-about"></i> <br />
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            <i class="menu-item-icon icon-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            <i class="menu-item-icon icon-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              MyBoxyBeta 设计模式分析
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2012-11-27
+        </span>
+
+        
+
+        
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <h1 id="MyBoxyBeta之架构设计">MyBoxyBeta之架构设计</h1><hr>
+<h2 id="前言:">前言:</h2><p>这个游戏已经写完很久很久很久了,当时还没有学会用git,版本管理是用最简单的打包src然后标明日期时间,现在看起来真是很幼稚的东西.当时是由两个大二的同学带着刚入大一下学期的我来开始的这个项目,实在是非常感谢.</p>
+<p>在简单的设计模式入门以后,才发现他们当时设计的架构已经非常不错了,对于我这样面对对象的新手来说,我当时的任务就是一个码农,由带队的老大设计好整个架构然后分配任务给我,很羞愧的是,我先自己按照功能需求完成细节(具体需求可以看DOC文档),然后再添加接口来匹配上层建筑.拿Mirror_Area,Black_Hole,Exclude_Hole来做例子吧,全部都是派生自Area这一个类的,我写的时候确是将三个具体类先完成,然后看到需要匹配基类,就将写好的类当中的需要独立的功能独立出来放入公共的接口当中.</p>
+<p>最后当我们完成整个程序的时候,基本框架的确是对了,但是我们疏忽了一点,性能!对于一个android的机器来说,并没有那么多的性能提供给我们,我们在初始化的时候,每一次的level select都会重新创建对象,最后虽然有释放,但是不管是android的还是java的GC都无法令人满意,我们在接近完成的时候是想修改的,无奈耦合的地方太多,难以修改.然后我们约定,在有限的将来当中,如果还有机会,要重构这个游戏.具体思路很简单,第一次进入游戏的时候就将所有需要用到的对象初始化,以后如果不需要用到,采用隐藏的方式而不是销毁,这样可以避免多次初始化造成的内存爆炸.</p>
+<hr>
+<h2 id="基本结构">基本结构</h2><p>首先,我们知道android的main入口其实就是Activity,本游戏一共有3个Activity,分别代表3个界面.前两个界面只涉及通过intent的activity的切换,十分简单,不作详解,同时,关于游戏引擎AndEngine也不作讨论,只讨论MyBoxyBetaActivity,即游戏界面.</p>
+<p><img src="http://i.imgur.com/qEssM.jpg" alt="IMG"> <img src="http://i.imgur.com/fOVDu.jpg" alt="IMG"> <img src="http://i.imgur.com/TQHA5.jpg" alt="IMG"></p>
+<hr>
+<h3 id="游戏操作类">游戏操作类</h3><p><img src="http://i.imgur.com/twfc5.jpg" alt="IMG"><br>游戏操作类一共有4个,其中最主要的当然是MyBoxyBetaActivity,控制着其他控制类的的操作,我把它称为controler.下面有3个属于关联关系的操作类,分别是Boxy_GameFinish,Boxy_level,Boxy_refresh.作用一看便知,分别用来结束游戏,初始化关卡,刷新关卡.</p>
+<p><img src="http://i.imgur.com/YlwIO.jpg" alt="IMG"></p>
+<p>而操作实体我称之为Object.基类Boxy_object拥有接口(interface) CommonFunction. Boxy_object派生3个主要的”实体类型”,分别是区域,板,特殊元件.其中板和特殊元件又是互相关联的.这3个类具体派生的类见UML图.</p>
+<p><img src="http://i.imgur.com/Ymfez.jpg" alt="IMG"></p>
+<p>为了减少操作类和具体实体类之间的耦合,所以以Boxy_object作为操作类可以直接使用的元素,所有需要生成具体实体都需要依赖Boxy_object这个基类,这样也能强制所有的具体实体都拥有相同的接口以方便初始化,销毁,启用以及休眠.</p>
+<p><img src="http://i.imgur.com/howTO.jpg" alt="IMG"></p>
+<h3 id="Boxy_level类">Boxy_level类</h3><p>Boxy_level类以一个数组private final static float[] level来储存所有的游戏关卡数据,每次需要初始化就根据当前关卡读取数组就可以了.读取关卡数据结束以后,就进入public void InitialObject()函数,进行具体实体的初始化,这里采用的是简单工厂模式,因为在组合并不多的情况下,没有必要使用抽象工厂或者其他的模式,</p>
+<p><img src="http://i.imgur.com/sIWwM.jpg" alt="Init object"></p>
+<figure class="highlight ceylon"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">public Boxy<span class="number">_</span>Object[] <span class="keyword">object</span><span class="number">_</span>array=<span class="keyword">new</span> Boxy<span class="number">_</span>Object[level<span class="number">_n</span>um]</span><br><span class="line"><span class="keyword">for</span>(i=<span class="number">0</span>;i&lt;level<span class="number">_n</span>um;++i)</span><br><span class="line">&#123;</span><br><span class="line">	seeker=level<span class="number">_</span>start<span class="number">_</span>index;</span><br><span class="line">	<span class="keyword">switch</span>((int)level[seeker])</span><br><span class="line">	&#123;</span><br><span class="line">	<span class="keyword">case</span> <span class="number">11</span>:</span><br><span class="line">		<span class="keyword">object</span><span class="number">_</span>array[i]=(Boxy<span class="number">_</span>Object)<span class="keyword">new</span> Boxy<span class="number">_</span>NormalBoard(..);</span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line">	<span class="keyword">case</span> <span class="number">12</span>:</span><br><span class="line">		<span class="keyword">object</span><span class="number">_</span>array[i]=(Boxy<span class="number">_</span>Object)<span class="keyword">new</span> Boxy<span class="number">_</span>WoodBoard(..);</span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line">	<span class="keyword">case</span> <span class="number">13</span>:</span><br><span class="line">		<span class="keyword">object</span><span class="number">_</span>array[i]=(Boxy<span class="number">_</span>Object)<span class="keyword">new</span> Boxy<span class="number">_</span>BlackHole(..);</span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line">	..</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过这样的工厂类,可以使得MyBoxyBetaActivity本身并不实际与各个具体实体相关联,当需要增加实体个数,种类的时候,只需要在level数据中增加就可以了,虽然并没有做成抽象工厂,但是我们的目的是可以轻松增加游戏关卡,而不是为了模式而作模式.尽管这里违背了开放-封闭原则,但是却依然易于维护,如果盲目增加工厂类,就会造成类数量过多反而不好维护的问题.</p>
+<h3 id="Boxy_GameFinish类">Boxy_GameFinish类</h3><p>Boxy_GameFinish类是负责当一个关卡结束的时候,销毁当前所有的实体的(其实这里希望做到的是隐藏,而不是销毁).当然,这个类本身并没有任何能够销毁实体的函数,他所做的仅仅指示发出消息罢了,通过这个消息,然后通知level类进行public void DestroyLevel()随后object基类调用public void destroy()这个函数而已,通过一个消息而监管所有的元素,这里采用的是观察者模式.</p>
+<p><img src="http://i.imgur.com/Xwq9l.jpg" alt="destroy object"></p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">DestroyLevel</span><span class="params">()</span></span><br><span class="line"></span>&#123;</span><br><span class="line"><span class="keyword">int</span> lv_num=(<span class="keyword">int</span>)level[level_start_index];</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;lv_num;++i)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span>(object_array[i]!=<span class="keyword">null</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">if</span>(!object_array[i].isrubbish)</span><br><span class="line">			object_array[i].destroy();</span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">			object_array[i]=<span class="keyword">null</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	java.lang.System.gc();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Boxy_refresh">Boxy_refresh</h3><p>Boxy_refresh是在用户并没有通过这一关的时候刷新本关关卡重新开始游戏的,最主要就是其中的三句而已.</p>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">parent</span><span class="built_in">.</span>level<span class="built_in">.</span>DestroyLevel();	</span><br><span class="line"><span class="keyword">parent</span><span class="built_in">.</span>level<span class="subst">=</span><span class="literal">new</span> Boxy_Level(<span class="keyword">parent</span><span class="built_in">.</span>level_index,<span class="keyword">parent</span>);</span><br><span class="line"><span class="keyword">parent</span><span class="built_in">.</span>level<span class="built_in">.</span>InitialObject();</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2012/12/14/opensource/">Open Source展示&impress.js</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2012/11/25/mfc_design_pattern_glit/">MFC之设计模式分析</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+
+    
+      <div class="comments" id="comments">
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/aniki.png" alt="slixurd" />
+          <p class="site-author-name">slixurd</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">16</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">0</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">0</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/slixurd" target="_blank">Github</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/slixurd" target="_blank">Twitter</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MyBoxyBeta之架构设计"><span class="nav-number">1.</span> <span class="nav-text">MyBoxyBeta之架构设计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言:"><span class="nav-number">1.1.</span> <span class="nav-text">前言:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本结构"><span class="nav-number">1.2.</span> <span class="nav-text">基本结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#游戏操作类"><span class="nav-number">1.2.1.</span> <span class="nav-text">游戏操作类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Boxy_level类"><span class="nav-number">1.2.2.</span> <span class="nav-text">Boxy_level类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Boxy_GameFinish类"><span class="nav-number">1.2.3.</span> <span class="nav-text">Boxy_GameFinish类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Boxy_refresh"><span class="nav-number">1.2.4.</span> <span class="nav-text">Boxy_refresh</span></a></li></ol></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp; 
+  2015
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">slixurd</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.3"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.3"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.3" id="motion.global"></script>
+
+
+
+  <script type="text/javascript" src="/js/search-toggle.js"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.3" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      var $tocContent = $('.post-toc-content');
+      if (isDesktop() && CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+  
+
+  
+
+
+
+
+  
+  
+
+</body>
+</html>
