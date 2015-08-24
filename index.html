@@ -138,6 +138,7 @@
   <div id="posts" class="posts-expand">
     
       
+        
 
   <div class="post post-type-normal ">
     <div class="post-header">
@@ -165,6 +166,13 @@
 
         
           
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/06/20/30days30tech_1_bower/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/06/20/30days30tech_1_bower/"></span>
+            </a>
+          </span>
+          
         
       </div>
     </div>
@@ -176,8 +184,7 @@
 
       
         
-          <h2 id="什么是Bower">什么是Bower</h2><p>Bower 是 twitter 推出的一款包管理工具，基于nodejs的模块化思想，把功能分散到各个模块中，让模块和模块之间存在联系，通过 Bower 来管理模块间的这种联系。</p>
-<p>而且Bower使用了一个flat dependency tree,一个包只提供一个版本，</p>
+          <h2 id="什么是Bower">什么是Bower</h2><p>Bower 是 twitter 推出的一款包管理工具，基于nodejs的模块化思想，把功能分散到各个模块中，让模块和模块之间存在联系，通过 Bower 来管理模块间的这种联系。Bower使用flat dependency tree</p>
 <h2 id="安装和使用">安装和使用</h2><p>这里使用Ubuntu，安装Nodejs和包管理npm请使用apt-get。由于Ubuntu有个包叫node，所以直接运行bower会提示出错<code>/usr/bin/env: node: 没有那个文件或目录</code>。为了解决这个问题，需要做个软链。另外大部分的依赖包都是从git上面拉取下来的，这都快成为业界规范了，因此再装个git吧。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get <span class="operator"><span class="keyword">install</span> nodejs</span><br><span class="line">sudo apt-<span class="keyword">get</span> <span class="keyword">install</span> npm</span><br><span class="line">sudo apt-<span class="keyword">get</span> <span class="keyword">install</span> git</span><br><span class="line">sudo npm <span class="keyword">install</span> -g bower</span><br><span class="line">//解决node文件不存在的问题</span><br><span class="line">sudo <span class="keyword">ln</span> -s /usr/<span class="keyword">bin</span>/nodejs /usr/<span class="keyword">bin</span>/node</span><br><span class="line">//解决bower没有权限的问题</span><br><span class="line">sudo chown $<span class="keyword">USER</span>:$<span class="keyword">USER</span> ~/.config/configstore/bower-github.yml</span><br><span class="line">//需要运行在非SUDO模式下，否则会有ESUDO错误。</span><br><span class="line">bower <span class="keyword">install</span> jquery</span></span><br></pre></td></tr></table></figure>
 <p>缓存目录位于<code>~/.config/configstore/bower_components</code>。可以通过find自行查找<code>find ./ -name bower_components</code></p>
@@ -204,8 +211,10 @@
   </div>
 
 
+      
     
       
+        
 
   <div class="post post-type-normal ">
     <div class="post-header">
@@ -232,6 +241,13 @@
         
 
         
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2014/05/11/nagaimichi/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2014/05/11/nagaimichi/"></span>
+            </a>
+          </span>
           
         
       </div>
@@ -345,8 +361,10 @@
   </div>
 
 
+      
     
       
+        
 
   <div class="post post-type-normal ">
     <div class="post-header">
@@ -373,6 +391,13 @@
         
 
         
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2013/08/06/springseed_node_webkit/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2013/08/06/springseed_node_webkit/"></span>
+            </a>
+          </span>
           
         
       </div>
@@ -411,8 +436,10 @@
   </div>
 
 
+      
     
       
+        
 
   <div class="post post-type-normal ">
     <div class="post-header">
@@ -439,6 +466,13 @@
         
 
         
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2013/07/13/nagaimichi_xiamen/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2013/07/13/nagaimichi_xiamen/"></span>
+            </a>
+          </span>
           
         
       </div>
@@ -538,8 +572,10 @@
   </div>
 
 
+      
     
       
+        
 
   <div class="post post-type-normal ">
     <div class="post-header">
@@ -566,6 +602,13 @@
         
 
         
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2013/06/13/first_whole_night_riding/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2013/06/13/first_whole_night_riding/"></span>
+            </a>
+          </span>
           
         
       </div>
@@ -643,6 +686,7 @@
   </div>
 
 
+      
     
   </div>
 
@@ -802,6 +846,27 @@
   
 
   
+
+    
+      
+    
+
+    <script type="text/javascript">
+      var disqus_shortname = 'slixurd';
+      var disqus_identifier = 'index.html';
+      var disqus_title = '';
+      var disqus_url = '';
+
+      (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      }());
+    </script>
+  
+
 
 
 
