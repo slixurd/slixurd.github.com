@@ -149,6 +149,109 @@
           
           
             
+              <a class="post-title-link" href="/2012/12/15/how_to_built_impress/">
+                impress.js使用小记
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2012-12-15
+        </span>
+
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2012/12/15/how_to_built_impress/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2012/12/15/how_to_built_impress/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <h1 id="前言">前言</h1><p>在偶然的机会下,接触到prezi这样一种展示工具,但是因为庞大的开发套件&amp;收费让我止步,幸运的是,找到了impress.js这样一种替代品,如此精简而又优秀的展示工具.impress.js需要搭配html+Css实现,尽管已经有两三个visual design tool,但是效果差强人意,唯一一个比较满意的就是markdown2impress.不过由于需要实现自己的网页风格,还是决定全部自己写.下面就介绍一个如何设计一个基于impress.js的网页/展示.</p>
+<hr>
+<blockquote>
+<p>首先还是先放官方demo以及我制作的presentation.</p>
+<p><a href="http://slixurd2.tk/person/presentation/presentation.html#/start-page" target="_blank" rel="external">demo-slixurd</a> 对内容感兴趣的一样可以进入<a href="http://slixurd2.tk/2012/12/14/opensource/" target="_blank" rel="external">OpenSource</a>查看以及下载</p>
+<p><a href="http://bartaz.github.com/impress.js/#/bored" target="_blank" rel="external">demo-official</a></p>
+</blockquote>
+<hr>
+<p>然后..一个JS如何实现一个网页呢?妈妈告诉我们,程序员们最重要的能力就是看源代码,所以当你下意识的点开查看源代码的时候,你已经开始迈出第一步了.原本想翻译作者的源代码的(因为作者把基本步骤都写在源代码里面了),不过看到已经有人翻译了,那二次劳动就免了,<a href="http://eyehere.net/2012/impress-js-chinese-course-tutorial/" target="_blank" rel="external">点击这里阅读eyehere的翻译</a> .鉴于网上的教程都是从一份英文教程翻译而来并且翻译的不知道如何评价.不过由于大体正确,我也没必要继续重复写,我就从另外的角度来讲好了.</p>
+<p>就如同作者所说的一样</p>
+<blockquote>
+<blockquote>
+<p>So if you want to build great presentation take a pencil and piece of paper. And turn off the computer.<br>Sketch, draw and write. Brainstorm your ideas on a paper. Try to build a mind-map of what you’d liketo present. It will get you closer and closer to the layout you’ll build later with impress.js.</p>
+</blockquote>
+</blockquote>
+<h2 id="布局">布局</h2><p><img src="http://i.imgur.com/h3frn.jpg" alt="impress"></p>
+<p>这是官方demo的布局.首先我们需要知道座标定位所需要的变量,impress.js一共提供了4个主要定位的参数(3d变换不算).</p>
+<blockquote>
+<p><code>data-x=&quot;3500&quot; //只要学过数学的都应该知道.这是直角座标系(装B的说法是-笛卡儿座标系)</code></p>
+<p><code>data-y=&quot;2100&quot; //但是方向不一样,y是以下为正方向的</code></p>
+<p><code>data-rotate=&quot;180&quot; //这个是旋转角度</code></p>
+<p><code>data-scale=&quot;6&quot;//这个是放大倍数</code></p>
+</blockquote>
+<p>定位点均为该子页面未缩放及旋转前的左上角,所以我们可以在图上看到座标系的原点.(不是(0,0)标示的位置,而是黑色x轴那里.)我们需要为每一个页面做定位.所以设计在这里就显得很重要了.<br>倍数可以带小数,例如0.001,旋转角度可以是负数,也可以超过360(表示多次旋转),善用缩放和旋转是让presentation出彩的重要一环.所以,离开电脑,好好画一下布局,好好设计才是正道,像我这种做完以后都不敢放overview的千万不要学.</p>
+<h2 id="基本结构">基本结构</h2><p>我们直接看全局结构吧,以下是最小结构</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="doctype">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">link</span> <span class="attribute">href</span>=<span class="value">"css/impress-demo.css"</span> <span class="attribute">rel</span>=<span class="value">"stylesheet"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">head</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="title">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">div</span> <span class="attribute">id</span>=<span class="value">"impress"</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!--content start tag --&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="title">div</span> <span class="attribute">id</span>=<span class="value">"first"</span> <span class="attribute">class</span>=<span class="value">"step"</span> <span class="attribute">data-x</span>=<span class="value">"0"</span> <span class="attribute">data-y</span>=<span class="value">"0"</span> <span class="attribute">data-rotate</span>=<span class="value">"180"</span> <span class="attribute">data-scale</span>=<span class="value">"3"</span>&gt;</span></span><br><span class="line">	        <span class="tag">&lt;<span class="title">p</span>&gt;</span>the first try<span class="tag">&lt;/<span class="title">p</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="title">div</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!--end tag --&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="title">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"js/impress.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">script</span>&gt;</span><span class="ocaml">impress<span class="literal">()</span>.init<span class="literal">()</span>;</span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>作为一个网页必须的元素当然都是必须有的,例如最外层的<code>&lt;html&gt;</code>标签,然后其中的<code>&lt;head&gt;</code>和<code>&lt;body&gt;</code>两个标签.谈谈impress.js需要的东西.</p>
+<p>第一个:<code>&lt;script src=&quot;js/impress.js&quot;&gt;&lt;/script&gt;//链接js脚本</code></p>
+<p>第二个:<code>&lt;script&gt;impress().init();&lt;/script&gt;//这个也可以用他自带的其他api,不过一般init就足够了</code></p>
+<p>选择可有:<code>&lt;link href=&quot;css/impress-demo.css&quot; rel=&quot;stylesheet&quot; /&gt;</code></p>
+<p>script最好就是直接放在body结束标签前,否则有机率无法载入.css样式表根据自己需要修改,删除,增加.<br>其实实际上,如果想偷懒的话,直接在我所标示的content tag中间加内容就可以了.</p>
+<p>鉴于impress.js只支持chrome,safari,ff.所以做不支持的提示是很重要的,因此可以这么写<code>&lt;body class=&quot;impress-not-supported&quot;&gt;</code> 在能够支持的情况下,js会自动替换掉这个class(不信的话用chrome打开网页查看源代码,查看和直接阅读html的区别),无须担心.</p>
+<p>最重要的就是#impress这个id,只有查找到这个标签的时候,才会执行impress.js.所以在body标签之后就是一个<code>&lt;div id=&quot;impress&quot;&gt;&lt;/div&gt;</code>的标签,所有的内容都在里面.</p>
+<p>然后就进入了子页面,每一个页面都是div,必须有的元素是:.step,x,y.例如上述例子<br><code>&lt;div id=&quot;first&quot; class=&quot;step&quot; data-x=&quot;0&quot; data-y=&quot;0&quot; data-rotate=&quot;180&quot; data-scale=&quot;3&quot;&gt;</code><br>id是这个子页面的名称,最后仅仅只在地址栏有显示,是页面的唯一标识,所以不能够相同.然后是class=”step”同时我们也可以用class=”step slide”这种滑动页面,不过step是必须的,slide是可选的,同时如果自己有编写css,一样可以用自己的class.随后必需的是data-x,data-y.如果没有scale,默认为1,没有角度,默认为0;</p>
+<p>另外,作者提供了data-z这个参数,也就是所谓的3d-transform,标示在z轴的位置.效果如同一开始的概览图的12号.另外还有data-rotate-x data-rotate-y  data-rotate-z 这些参数,唯一不同的是,这些的参数的单位是度数.而x,y,z使用的是px.此外还有一些参数感觉没有什么用的就没有解释了,都可以在源代码的注释里找到.</p>
+<p>推荐源代码注释和本文都一起读,否则会觉得不知所以.关于css的部分我就不讲解了.我自己的presentation中最主要用的两个类是blurBG和pic.只是简单的圆角+背景+透明度+阴影的组合而已.可以自己尝试搭配,实在不会的话可以搭配各种代码审查(主流浏览器下按F12)查看css并做修改.</p>
+
+        
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </div>
+  </div>
+
+
+      
+    
+      
+        
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
               <a class="post-title-link" href="/2012/12/14/opensource/">
                 Open Source展示&impress.js
               </a>
@@ -551,110 +654,6 @@
 
       
     
-      
-        
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2012/11/14/jekyll_study/">
-                jeykll 记录
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          发表于 2012-11-14
-        </span>
-
-        
-
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2012/11/14/jekyll_study/#comments" >
-              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2012/11/14/jekyll_study/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <h2 id="google_analytics&amp;&amp;disqus">google analytics&amp;&amp;disqus</h2><p>不知道原因为何，在自己建立的github pages中无法引用作者提供的analytics和disqus，那就自己修改一下吧。步骤很简单。<br>如下代码：</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">script</span> <span class="attribute">type</span>=<span class="value">"text/javascript"</span>&gt;</span><span class="javascript"></span><br><span class="line">  <span class="keyword">var</span> _gaq = _gaq || [];</span><br><span class="line">  _gaq.push([<span class="string">'_setAccount'</span>, <span class="string">'UA-XXXXX-Y'</span>]);</span><br><span class="line">  _gaq.push([<span class="string">'_trackPageview'</span>]);</span><br><span class="line">  (<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> ga = <span class="built_in">document</span>.createElement(<span class="string">'script'</span>); ga.type = <span class="string">'text/javascript'</span>; ga.async = <span class="literal">true</span>;</span><br><span class="line">    ga.src = (<span class="string">'https:'</span> == <span class="built_in">document</span>.location.protocol ? <span class="string">'https://ssl'</span> : <span class="string">'http://www'</span>) + <span class="string">'.google-		analytics.com/ga.js'</span>;</span><br><span class="line">    <span class="keyword">var</span> s = <span class="built_in">document</span>.getElementsByTagName(<span class="string">'script'</span>)[<span class="number">0</span>]; s.parentNode.insertBefore(ga, s);</span><br><span class="line">  &#125;)();</span><br><span class="line"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p>最后，可以将自己的<code>_includes</code>的<code>analytics-providers</code>文件夹和<code>analytics</code>都删掉，因为没用了。注意，记得用git rm来删除，否则最后上传到git上还是有的，除非你先删除整个分支，不过就显得过于麻烦了。既然删除了JB提供的套件，其实<code>_config.yml</code>文件里面相应的部分也可以删除了。为了简洁和减少错误着想，都删了比较好，也不会以后看到突然不知道是什么。</p>
-<p>disqus基本操作都和analytics一样，就不复述了，记得自己去<code>disqus.com</code>注册申请帐号然后得到自己的shortname。选择install instruction的时候点universal code，复制粘贴到post.html文件的comment段就可以了.</p>
-<pre><code><span class="tag">&lt;<span class="title">div</span> <span class="attribute">id</span>=<span class="value">"disqus_thread"</span>&gt;</span><span class="tag">&lt;/<span class="title">div</span>&gt;</span>
-<span class="tag">&lt;<span class="title">script</span> <span class="attribute">type</span>=<span class="value">"text/javascript"</span>&gt;</span><span class="javascript">
-<span class="comment">/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */</span>
-<span class="keyword">var</span> disqus_shortname = <span class="string">'slixurd'</span>; <span class="comment">// required: replace example with your forum shortname    /* * * DON'T EDIT BELOW THIS LINE * * */</span>
-(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>{
-<span class="keyword">var</span> dsq = <span class="built_in">document</span>.createElement(<span class="string">'script'</span>); dsq.type = <span class="string">'text/javascript'</span>; dsq.async = <span class="literal">true</span>;
-dsq.src = <span class="string">'http://'</span> + disqus_shortname + <span class="string">'.disqus.com/embed.js'</span>;
-(<span class="built_in">document</span>.getElementsByTagName(<span class="string">'head'</span>)[<span class="number">0</span>] || <span class="built_in">document</span>.getElementsByTagName(<span class="string">'body'</span>)[<span class="number">0</span>]).appendChild(dsq);
-})();
-</span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>
-<span class="tag">&lt;<span class="title">noscript</span>&gt;</span>Please enable JavaScript to view the <span class="tag">&lt;<span class="title">a</span> <span class="attribute">href</span>=<span class="value">"http://disqus.com/?ref_noscript"</span>&gt;</span>comments powered by Disqus.<span class="tag">&lt;/<span class="title">a</span>&gt;</span><span class="tag">&lt;/<span class="title">noscript</span>&gt;</span>
-<span class="tag">&lt;<span class="title">a</span> <span class="attribute">href</span>=<span class="value">"http://disqus.com"</span> <span class="attribute">class</span>=<span class="value">"dsq-brlink"</span>&gt;</span>comments powered by <span class="tag">&lt;<span class="title">span</span> <span class="attribute">class</span>=<span class="value">"logo-disqus"</span>&gt;</span>Disqus<span class="tag">&lt;/<span class="title">span</span>&gt;</span><span class="tag">&lt;/<span class="title">a</span>&gt;</span>
-</code></pre><hr>
-<h1 id="Jekyll_bootstrap架构">Jekyll bootstrap架构</h1><ul>
-<li><p><strong>_layout</strong>文件夹里面有3个文件，default，page，post。分别对应3种页面的格式。很显然，就是自己建立的文章的layout，就像一般写blog要求在_posts文件夹下直接用rake生成一样。实质就是引用了post格式。打开3个文件都可以看到源代码。什么都没做，例如page只是引用了</p>
-<p>  { % include JB/setup  %}<br>  { % include themes/twitter/page.html  %} <br><br>仅此而已。应该是为了方便切换theme所设计的。</p>
-</li>
-<li><p><strong>_includes/themes/twitter/</strong>就是主要的页面layout了。需要增加的可以自行添加html，记得留下content就可以配合markdown一起使用了。</p>
-</li>
-<li><strong>_includes/JB</strong>这个文件夹就是一些作者写的扩展功能，例如taglist里面如何提取相同tag形成list的。当然用的都是liquid语言。</li>
-<li><strong>_asset</strong>是整个页面的布局，包括图片，包括css。如果想要修改颜色，背景图片，为webkit加上透明，阴影各种效果都是写在css里面。最后还有一个_site文件夹。这个文件夹是jekyll —server编译出来的，就是别人所能见到的网站，当然据说github编译的时候，都会加上<code>safe</code>参数，这个文件夹在github上看不到的。</li>
-<li><p><strong>根目录</strong></p>
-<blockquote>
-<ul>
-<li><strong>CNAME</strong>显而易见解析使用的，内容只有一句，自己的域名。当然在此之前需要先修改自己domain的A记录，改为github的地址，ping下可以得到。</li>
-<li><strong>_config.yml</strong>估计看过作者介绍的人也不会不知道这是什么了。如果不知道的话，不想看英文的话，有博客简单翻译了一部分，基本足够用。<a href="http://www.mceiba.com/develop/jekyll-introduction.html" target="_blank" rel="external">http://www.mceiba.com/develop/jekyll-introduction.html</a> </li>
-<li><strong>**.html</strong> 这个就是你的顶栏会出现的页面，或者应该说你点进pages以后会看到的所有网页。默认的顶栏有5个。分别对应5个html文件（Archive，Tags，Categories，Pages，还有index），需要自己在顶栏增加页面参照模板来增加就可以了，例如about页面。需要的只是选择page这种layout，然后包含JB自带的设定，也就是<code>include JB/setup</code>这一句，剩下的部分就自己补全吧，想用md写也行，直接写html也行。最后出现在_site的结果是一样的。</li>
-</ul>
-</blockquote>
-</li>
-<li><p><strong>markdown</strong>会鸟语的直接看鸟语吧，不会的可以看翻译版本<a href="http://wowubuntu.com/markdown/#autolink" target="_blank" rel="external">http://wowubuntu.com/markdown/#autolink</a>,鸟语版本链接：<a href="http://daringfireball.net/projects/markdown/syntax" target="_blank" rel="external">http://daringfireball.net/projects/markdown/syntax</a></p>
-</li>
-</ul>
-
-        
-      
-    </div>
-
-    <div class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </div>
-  </div>
-
-
-      
-    
   </div>
 
   
@@ -693,7 +692,7 @@ dsq.src = <span class="string">'http://'</span> + disqus_shortname + <span class
         <div class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">16</span>
+              <span class="site-state-item-count">17</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
