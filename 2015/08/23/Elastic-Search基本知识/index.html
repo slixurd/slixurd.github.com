@@ -1,0 +1,639 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.3"/>
+
+
+
+
+  <meta name="keywords" content="slixurd" />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.3" />
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    analytics: {
+      google: ''
+    },
+    sidebar: 'post'
+  };
+</script>
+
+
+
+
+  <title> Elastic Search基本知识 // slixurd </title>
+</head>
+
+<body>
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">slixurd</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<div class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/">
+            <i class="menu-item-icon icon-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            <i class="menu-item-icon icon-about"></i> <br />
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            <i class="menu-item-icon icon-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            <i class="menu-item-icon icon-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              Elastic Search基本知识
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2015-08-23
+        </span>
+
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/08/23/Elastic-Search基本知识/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/08/23/Elastic-Search基本知识/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <h1 id="安装">安装</h1><p>下载安装文件</p>
+<pre><code>wget <span class="symbol">https:</span>/<span class="regexp">/download.elastic.co/elasticsearch</span><span class="regexp">/elasticsearch/elasticsearch</span>-<span class="number">1.7</span>.<span class="number">1</span>.tar.gz
+</code></pre><p>解压</p>
+<pre><code><span class="tag">tar</span> <span class="tag">xvf</span> <span class="tag">elasticsearch-1</span><span class="class">.7</span><span class="class">.1</span><span class="class">.tar</span><span class="class">.gz</span>
+</code></pre><p>安装管理软件Marvel</p>
+<pre><code>.<span class="regexp">/bin/</span>plugin -i elasticsearch<span class="regexp">/marvel/</span>latest
+</code></pre><h1 id="客户端">客户端</h1><h2 id="node_client">node client</h2><p>节点客户端以无数据节点身份加入集群，本身不存储诗句，但是知道数据的位置，并且能够转发请求道对应节点上。</p>
+<h2 id="transport_client">transport client</h2><p>不加入集群，只转发请求。<br>客户端都是以9300号端口交互，使用私有传输协议，ElasticSearch Transport Protocol。<br>http模式以9200端口交互。</p>
+<h1 id="操作">操作</h1><pre><code>curl -X<span class="tag">&lt;<span class="title">VERB</span>&gt;</span> '<span class="tag">&lt;<span class="title">PROTOCOL</span>&gt;</span>://<span class="tag">&lt;<span class="title">HOST</span>&gt;</span>/<span class="tag">&lt;<span class="title">PATH</span>&gt;</span>?<span class="tag">&lt;<span class="title">QUERY_STRING</span>&gt;</span>' -d '<span class="tag">&lt;<span class="title">BODY</span>&gt;</span>'
+</code></pre><p>VERB包括 GET,POST,PUT,HEAD,DELETE<br>BODY为JSON格式的请求主体。</p>
+<pre><code>Relational DB <span class="subst">-&gt; </span>Databases <span class="subst">-&gt; </span>Tables <span class="subst">-&gt; </span><span class="keyword">Rows</span> <span class="subst">-&gt; </span>Columns Elasticsearch <span class="subst">-&gt; </span>Indices   <span class="subst">-&gt; </span>Types  <span class="subst">-&gt; </span>Documents <span class="subst">-&gt; </span>Fields
+</code></pre><p>关系类比。</p>
+<p>一个集群可以包含多个索引，一个索引有多个类型，每个类型有多个文档，每个问的那个有多个字段。<br>一般来说，认为Document是最顶层结构/根对象 序列化成的JSON数据，而对象一般认为是一个JSON结构体，对象还能包含其他对象。<br>元数据主要有3个，_index,_type,_id。</p>
+<h2 id="创建">创建</h2><p>创建文档可以使用PUT，也可以使用POST，唯一的区别在于是否由用户提供_id</p>
+<pre><code>POST <span class="regexp">/website/blog/</span>
+</code></pre><p>使用POST可以由ES自己生成_id，避免由于_id相同导致的碰撞，id为22位的UUID<br>使用</p>
+<pre><code>PUT /website/blog/<span class="number">123</span>?op_<span class="built_in">type</span>=create
+</code></pre><p>可以直接声明_id，但是如果id已经存在，则会替换旧的数据，_version版本号提高1，_create改为false，如果需要保证是创建而不是更新，可以使用显式的op_type参数，如果冲突，会返回409 Conflict，如果成功，会返回201 Created。<br>也可以使用简化</p>
+<pre><code>PUT <span class="regexp">/website/</span>blog<span class="regexp">/123/</span>_create
+</code></pre><h2 id="获取">获取</h2><pre><code><span class="comment">GET</span> <span class="comment">/website/blog/123?pretty</span>
+</code></pre><p>可以获取文档。<br>参数可选<br>使用pretty可让文档显示的更加美观<br>使用_source可以控制_source字段返回的数据，ES可以仅仅返回用户需要的数据，例如_source=title,如果只使用_source，ES不返回metadata，只返回用户数据。<br>另外可以使用HEAD来确认文档是否存在，当返回为200时文档存在，返回为404时文档不存在</p>
+<pre><code>curl -<span class="tag">i</span> -XHEAD http:<span class="comment">//localhost:9200/website/blog/123</span>
+</code></pre><h2 id="删除">删除</h2><pre><code><span class="keyword">DELETE</span> <span class="regexp">/website/</span>blog<span class="regexp">/123</span>
+</code></pre><p>使用DELETE来删除文档。不管文档是否删除成功，该文档的_version都会自增。</p>
+<h2 id="更新">更新</h2><p>更新可以直接使用PUT对已有数据进行更新。<br>也可以使用_update局部更新</p>
+<h2 id="搜索">搜索</h2><h3 id="空搜索">空搜索</h3><p>直接使用</p>
+<pre><code><span class="title">GET</span> /_search
+</code></pre><p>响应内容中有 <code>{took : times , hits : { total : n , hits : [ … ] }}</code><br>Took表示本次请求花费的毫秒，hits表示匹配到的文档。文档中包含一个_score评分</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">&#123;    </span><br><span class="line">	"<span class="attribute">hits</span>" : <span class="value">&#123;</span><br><span class="line">		"<span class="attribute">total</span>" :<span class="value"><span class="number">14</span></span>,</span><br><span class="line">		"<span class="attribute">hits</span>" : <span class="value">[</span><br><span class="line">				&#123;</span><br><span class="line">					"<span class="attribute">_index</span>":<span class="value"><span class="string">"us"</span></span>,</span><br><span class="line">					"<span class="attribute">_type</span>":<span class="value"><span class="string">"tweet"</span></span>,</span><br><span class="line">					"<span class="attribute">_id</span>":<span class="value"><span class="string">"7"</span></span>,</span><br><span class="line">					"<span class="attribute">_score</span>":<span class="value"><span class="number">1</span></span>,</span><br><span class="line">					"<span class="attribute">_source</span>": <span class="value">&#123;</span><br><span class="line">								"<span class="attribute">date</span>":	<span class="value"><span class="string">"2014-09-17"</span></span>,</span><br><span class="line">								"<span class="attribute">name</span>":	<span class="value"><span class="string">"John Smith"</span></span>,	</span><br><span class="line">								"<span class="attribute">tweet</span>":<span class="value"><span class="string">"The Query DSL is really powerful and flexible"</span></span>,</span><br><span class="line">								"<span class="attribute">user_id</span>": <span class="value"><span class="number">2</span></span><br><span class="line">								</span>&#125;        </span><br><span class="line">				</span>&#125;,</span><br><span class="line">				... <span class="number">9</span> RESULTS REMOVED ...       </span><br><span class="line">		]</span>,       </span><br><span class="line">		"<span class="attribute">max_score</span>" :   <span class="value"><span class="number">1</span>   </span><br><span class="line">	</span>&#125;</span>,    </span><br><span class="line">	"<span class="attribute">took</span>" :<span class="value"><span class="number">4</span></span>,    </span><br><span class="line">	"<span class="attribute">_shards</span>" : <span class="value">&#123;       </span><br><span class="line">		"<span class="attribute">failed</span>" :<span class="value"><span class="number">0</span></span>,       </span><br><span class="line">		"<span class="attribute">successful</span>" :<span class="value"><span class="number">10</span></span>,       </span><br><span class="line">		"<span class="attribute">total</span>" :<span class="value"><span class="number">10</span>   </span><br><span class="line">	</span>&#125;</span>,</span><br><span class="line">	"<span class="attribute">timed_out</span>" :<span class="value"><span class="literal">false</span></span><br><span class="line"></span>&#125;</span><br></pre></td></tr></table></figure>
+<p>评分为relevance score，在提供了查询条件的情况下，文档按照相关性评分降序排列。<br>_shards表示参数查询的分片数。<br>time_out表示是否超时，如果要求响应速度，可以限制time_out，这样ES会在请求超时前返回收集到的结果</p>
+<pre><code>GET /_search?<span class="keyword">timeout</span>=<span class="number">10</span>ms
+</code></pre><h3 id="限定搜索">限定搜索</h3><pre><code>/<span class="keyword">index</span>[,<span class="keyword">index</span>]/_search 限制在几个索引间搜索数据
+</code></pre><p>也可以使用通配符搜索。/g*/_search，以g开头的index中搜索。</p>
+<pre><code>/<span class="keyword">index</span>[,<span class="keyword">index</span>]/<span class="keyword">type</span>[,<span class="keyword">type</span>]/_search 在<span class="keyword">index</span>索引中，搜索<span class="keyword">type</span>中的文档。
+</code></pre><h3 id="分页">分页</h3><pre><code>GET /_search?<span class="variable">size=</span><span class="number">5</span>&amp;<span class="variable">from=</span><span class="number">10</span>
+</code></pre><h3 id="简单搜索">简单搜索</h3><pre><code>GET /<span class="built_in">index</span>/<span class="keyword">type</span>/search?q=key:<span class="keyword">value</span>
+</code></pre><p>表示搜索key字段包含value的文档</p>
+<pre><code>+k1:(<span class="literal">v1</span> <span class="literal">v3</span>) -k2:<span class="literal">v2</span> +date:&gt;<span class="number">2014</span>-<span class="number">09</span>-<span class="number">10</span>
+</code></pre><p>表示必须含有k1:v1,v3和必须没有k2:v2，时间大于给定时间的文档</p>
+<pre><code>GET /<span class="number">_</span>search?q=<span class="keyword">value</span>
+</code></pre><p>表示含有value的文档。因为ES会将所有的字段拼接起来，形成一个_all字段，最终被ES索引。</p>
+<p>一般搜索结构：<br><figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="tag">QUERY_NAME</span>: &#123;</span><br><span class="line">		<span class="tag">FIELD_NAME</span>: &#123;</span><br><span class="line">			<span class="attribute">ARGUMENT</span>: VALUE,</span><br><span class="line">			<span class="attribute">ARGUMENT</span>: VALUE,</span><br><span class="line">			...</span><br><span class="line">		&#125;</span><br><span class="line">	&#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="过滤">过滤</h3><ul>
+<li>term : <code>&quot;term&quot;:{ k:v }</code> 主要用于精确匹配，包括bool，日期，数字，未经分析的字符串。</li>
+<li>terms : <code>&quot;terms&quot;:{ k:[v1,v2] }</code> 可以用于精确匹配多个值。</li>
+<li>range : <code>&quot;range&quot;: { k:{&quot;lte&quot;:20,&quot;gte&quot;:30} }</code> 可以用于指定范围查找数据，范围操作符包含:gt,gte,lt,lte</li>
+<li>exists|missing : <code>&quot;exists&quot;:{ &quot;field&quot;:&quot;k&quot; }</code> 这两个过滤语句仅用于已经找到文档后的过滤</li>
+<li><p>bool过滤 : </p>
+  <figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"bool"</span>: &#123; </span><br><span class="line">	<span class="string">"must"</span>: &#123; </span><br><span class="line">		<span class="string">"term"</span>: &#123; <span class="string">"folder"</span>: <span class="string">"inbox"</span> &#125;</span><br><span class="line">		&#125;,</span><br><span class="line">	<span class="string">"should"</span>: [&#123; … &#125;,&#123; … &#125;] </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>  可以用来合并多个过滤条件查询结果的布尔逻辑。<br>  must表示多个结果的完全匹配，must_not表示多个结果的完全匹配的否定，should表示至少有一个查询条件匹配</p>
+</li>
+</ul>
+<h3 id="查询">查询</h3><ul>
+<li>match_all : <code>&quot;match_all&quot;: {}</code> 表示匹配所有文档</li>
+<li>match : match是一个标准查询</li>
+<li>multi_match : <code>&quot;multi_match&quot;:{ k:v, k:[v,v] }</code> 允许一次查询多个字段</li>
+<li><p>bool查询 : </p>
+  <figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"bool"</span>: &#123; </span><br><span class="line">	<span class="string">"must"</span>: &#123; </span><br><span class="line">		<span class="string">"match"</span>: &#123; <span class="string">"title"</span>: <span class="string">"how to make millions"</span> &#125;</span><br><span class="line">	&#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>  bool查询相比bool过滤多了一部查询_score的步骤</p>
+</li>
+</ul>
+<h3 id="组合查询">组合查询</h3><p>过滤和查询需要放置在对应的context当中，过滤对应filter，查询对应query<br>由于search API中只能使用query语句，所以多重查询中需要使用filtered来包含query和其他过滤语句。<br>例如同时使用match查询和term过滤。<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"query"</span>: &#123; </span><br><span class="line">	<span class="string">"filtered"</span>: &#123; </span><br><span class="line">		<span class="string">"query"</span>: &#123; <span class="string">"match"</span>: &#123; <span class="string">k:</span>v &#125; &#125;, </span><br><span class="line">		<span class="string">"filter"</span>: &#123; <span class="string">"term"</span>: &#123; <span class="string">k:</span>v &#125; &#125; </span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果想要匹配所有的文档，可以忽略query语句的match查询，这样filtered会默认补充一个match_all的查询。以下两句效果相同。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"query"</span>: &#123; <span class="string">"filtered"</span>: &#123; <span class="string">"query"</span>: &#123; <span class="string">"match_all"</span>: &#123; &#125; &#125; , <span class="string">"filter"</span>: &#123; <span class="string">"term"</span>: &#123; <span class="string">k:</span>v &#125; &#125; &#125;</span><br><span class="line"><span class="string">"query"</span>: &#123; <span class="string">"filtered"</span>: &#123; <span class="string">"filter"</span>: &#123; <span class="string">"term"</span>: &#123; <span class="string">k:</span>v &#125; &#125; &#125;</span><br></pre></td></tr></table></figure>
+<p>另外，过滤语句中可以使用query方式代替bool过滤子句。<br>例如 <code>&quot;must_not&quot;: { &quot;query&quot; : { ... } }</code> 但是这种方式使用比较少。</p>
+<h3 id="查询检测_-_validate_API">查询检测 - validate API</h3><p>validate API可以用于检测查询语句是否合法。</p>
+<pre><code>GET /index/<span class="class"><span class="keyword">type</span>/<span class="title">_validate</span>/<span class="title">query</span> &lt;BODY&gt;</span>
+</code></pre><p>如果需要查询具体错误信息，可以加上explain参数,query?explain<br>如果查询语句合法的情况下，explain会针对每一个index返回不同的描述。因为不同的index有不同的映射关系和分析器，例如tweet:powerful这样的查询语句，在一个分析器里可能查询powerful单词，在另外一个使用english分析器的index里就是查询power单词。</p>
+<h3 id="排序">排序</h3><h4 id="默认排序：__score">默认排序： _score</h4><p>一般情况下得到的文档都以_score降序排列，相关性高的排在前面。过滤语句不影响_score，如果使用了match_all或者隐式使用了match_all，那么所有的文档的得分都是1.</p>
+<h4 id="字段值排序">字段值排序</h4><p>使用sort对字段值进行排序。</p>
+<pre><code><span class="collection">{ <span class="string">"query"</span> : <span class="collection">{ … }</span>, <span class="string">"sort"</span>: <span class="collection">{ <span class="string">"date"</span>: <span class="collection">{ <span class="string">"order"</span>: <span class="string">"desc"</span> }</span> }</span> }</span>
+</code></pre><p>如果使用了sort排序，那么在没有显式指定track_scores为true的情况下，每一个文档的_score和查询的max_score都不会被计算。<br>因为相关性的计算比较消耗性能，如果指定了排序规则，就没有必要计算了。另外假如排序是date的情况下，date会被转成timestamp用于计算。</p>
+<p>如果需要顺序排列时，可以使用简写。 <code>&quot;sort&quot;: &quot;key&quot;</code><br>如果需要多级排序，可以使用： <code>&quot;sort&quot;: [ k1:{&quot;order&quot;: &quot;desc&quot; }, k2:{&quot;order&quot;: &quot;desc&quot; } ]</code><br>如果需要排列的字段是一个数组，那么可以使用min, max, avg 或 sum这些模式来排序。<code>&quot;sort&quot;: { k1:{&quot;order&quot;: &quot;desc&quot;,&quot;mode&quot;: &quot;min&quot; } }</code></p>
+<p>如果对于针对全文搜索而使用了analyzer的字段上进行排序，很难得到正确的结果。因此针对这些值，需要重新指定类型。<br>默认：<br><figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"tweet"</span>: &#123;</span><br><span class="line">	<span class="string">"type"</span>:<span class="string">"string"</span>,</span><br><span class="line">	<span class="string">"analyzer"</span>: <span class="string">"english"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>修改后：<br><figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"tweet"</span>: &#123;</span><br><span class="line">    <span class="string">"type"</span>:     <span class="string">"string"</span>,</span><br><span class="line">    <span class="string">"analyzer"</span>: <span class="string">"english"</span>,</span><br><span class="line">    <span class="string">"fields"</span>: &#123;</span><br><span class="line">        <span class="string">"raw"</span>: &#123; </span><br><span class="line">            <span class="string">"type"</span>:  <span class="string">"string"</span>,</span><br><span class="line">            <span class="string">"index"</span>: <span class="string">"not_analyzed"</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>tweet 字段用于全文本的 analyzed 索引方式不变。新增的 tweet.raw 子字段索引方式是 not_analyzed。<br>后面可以使用 <code>&quot;sort&quot;: &quot;tweet.raw&quot;</code> 来对这个字段进行排序。</p>
+
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/08/24/Elastic-Search-Java-API-Section-1/">Elastic Search Java API Section 1</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/06/20/30days30tech_1_bower/">Bower</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </div>
+  </div>
+
+
+
+    
+
+    
+      <div class="comments" id="comments">
+        
+          <div id="disqus_thread">
+            <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+          </div>
+        
+      </div>
+    
+  </div>
+
+
+        </div>
+
+        
+      </div>
+
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview">
+        <div class="site-author motion-element">
+          <img class="site-author-image" src="/images/aniki.png" alt="slixurd" />
+          <p class="site-author-name">slixurd</p>
+        </div>
+        <p class="site-description motion-element"></p>
+        <div class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">18</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">0</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">0</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </div>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+              <a href="https://github.com/slixurd" target="_blank">Github</a>
+            </span>
+            
+              <span class="links-of-author-item">
+              <a href="https://twitter.com/slixurd" target="_blank">Twitter</a>
+            </span>
+            
+          
+        </div>
+
+        
+        
+
+      </div>
+
+      
+        <div class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安装"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#客户端"><span class="nav-number">2.</span> <span class="nav-text">客户端</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#node_client"><span class="nav-number">2.1.</span> <span class="nav-text">node client</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#transport_client"><span class="nav-number">2.2.</span> <span class="nav-text">transport client</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#操作"><span class="nav-number">3.</span> <span class="nav-text">操作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建"><span class="nav-number">3.1.</span> <span class="nav-text">创建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获取"><span class="nav-number">3.2.</span> <span class="nav-text">获取</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删除"><span class="nav-number">3.3.</span> <span class="nav-text">删除</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更新"><span class="nav-number">3.4.</span> <span class="nav-text">更新</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#搜索"><span class="nav-number">3.5.</span> <span class="nav-text">搜索</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#空搜索"><span class="nav-number">3.5.1.</span> <span class="nav-text">空搜索</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#限定搜索"><span class="nav-number">3.5.2.</span> <span class="nav-text">限定搜索</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分页"><span class="nav-number">3.5.3.</span> <span class="nav-text">分页</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简单搜索"><span class="nav-number">3.5.4.</span> <span class="nav-text">简单搜索</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#过滤"><span class="nav-number">3.5.5.</span> <span class="nav-text">过滤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查询"><span class="nav-number">3.5.6.</span> <span class="nav-text">查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#组合查询"><span class="nav-number">3.5.7.</span> <span class="nav-text">组合查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查询检测_-_validate_API"><span class="nav-number">3.5.8.</span> <span class="nav-text">查询检测 - validate API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#排序"><span class="nav-number">3.5.9.</span> <span class="nav-text">排序</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#默认排序：__score"><span class="nav-number">3.5.9.1.</span> <span class="nav-text">默认排序： _score</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#字段值排序"><span class="nav-number">3.5.9.2.</span> <span class="nav-text">字段值排序</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </div>
+      
+
+    </div>
+  </div>
+
+
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp; 
+  2015
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">slixurd</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.3"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.3"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.3" id="motion.global"></script>
+
+
+
+  <script type="text/javascript" src="/js/search-toggle.js"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.3" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      var $tocContent = $('.post-toc-content');
+      if (isDesktop() && CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    });
+  </script>
+
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+  
+
+  
+
+    
+      
+    
+
+    <script type="text/javascript">
+      var disqus_shortname = 'slixurd';
+      var disqus_identifier = '2015/08/23/Elastic-Search基本知识/';
+      var disqus_title = 'Elastic Search基本知识';
+      var disqus_url = 'http://slixurd.github.io/2015/08/23/Elastic-Search基本知识/';
+
+      (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      }());
+    </script>
+  
+
+
+
+
+
+  
+  
+
+</body>
+</html>
