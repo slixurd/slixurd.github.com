@@ -149,6 +149,96 @@
           
           
             
+              <a class="post-title-link" href="/2012/11/25/mfc_design_pattern_glit/">
+                MFC之设计模式分析
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2012-11-25
+        </span>
+
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2012/11/25/mfc_design_pattern_glit/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2012/11/25/mfc_design_pattern_glit/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <h1 id="MFC之设计模式分析">MFC之设计模式分析</h1><p><img src="http://i.imgur.com/xPk2f.jpg" alt="all"></p>
+<h2 id="程序的起点_命运之始">程序的起点 命运之始</h2><p>既然是C++程序,必然是由main函数(MFC中是WinMain)开始的.MFC作为一个成熟的软件框架,自然有着老练的一套-一个程序的实例需要有唯一的初始化(这里并不表示一个程序只能打开一次(即一个实例),仅能有一个实例这是通过自己重载initApplication实现的,但是这并不是其初衷).因此在程序尚未初始化的时候,就利用全局函数AfxGetApp取得该程序theApp的对象指针,然后用该指针指导后续界面,功能的加载.</p>
+<p>显然,<strong>这里用的是Singleton模式</strong>.不直接对类进行初始化转而利用函数获得该类的指针以保证仅有一个实例.</p>
+<blockquote>
+<p><code>pApp-&gt;InitApplication()</code></p>
+<p><code>pApp-&gt;InitInstance()</code></p>
+</blockquote>
+<p><img src="http://i.imgur.com/UPxku.jpg" alt="Imgur"></p>
+<p>当然这里的Singleton和我们一般学习的不太相同,但是这也体现了设计模式并不是照搬的这一重要特点.设计模式并不是传统的模式,更应该说是一种设计思想,其实现方式可以各种各样.一般的Singleton采用将构造函数设置为protected,这样就可以避免client类错误初始化(Java Script就没有,所以需要用其他方法),然后设计一个静态static的指针返回该类指针.MFC中使用的更类似JS的方法:<code>ASSERT(AfxGetThread() == NULL);</code>.即,如果<code>AfxGetThread() == NULL</code>,那么初始化,否则失败.<br>借由Singleton模式,对程序进行初始化.基本顺序是<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1. <span class="tag">pApp-</span>&gt;<span class="tag">InitInstance</span>()</span><br><span class="line">2. <span class="rule"><span class="attribute">CmyWinApp</span>:<span class="value">:<span class="function">InitInstance</span>() </span><br><span class="line">   &#123;</span><br><span class="line">	m_pMainWnd=new CMyFrameWnd</span></span>;</span><br><span class="line">   &#125;</span><br><span class="line">3. <span class="rule"><span class="attribute">CMyFrameWnd</span>:<span class="value">:<span class="function">Create</span>()&#123;<span class="function">CreateEx</span>()</span></span>;&#125;</span><br><span class="line">4. <span class="rule"><span class="attribute">CWnd</span>:<span class="value">:<span class="function">CreateEx</span>()&#123;<span class="function">PreCreateWindow</span>()</span></span>;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>由于有RTTI的原因,所以有很多地方就不需要用到常用的设计模式了,因为已经能够自己识别自己的类型,就不需要另外的抽象和实现的分离.简单说一下,RTTI分为两种,均用C风格的MACRO来编写,动态识别分别为<code>DECLARE_DYNAMIC</code>和 <code>IMPLEMENT_DYNAMIC</code>,动态创建为<code>DECLARE_DYNCREATE</code>和<code>IMPLEMENT_DYNCREATE</code>.这里主要讨论设计模式,所以对RTTI不作细究.当然RTTI贯穿整个MFC,是非常重要的元素.</p>
+<p>另外,并不仅仅只有pApp才用了Singleton模式,其他的例如CDC也有使用.</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">void CScribbleView<span class="value">::<span class="function">OnDraw</span>(CDC* pDC)</span><br><span class="line">&#123;</span><br><span class="line">	CScribbleDoc* pDoc = <span class="function">GetDocument</span>();</span></span><br><span class="line">	<span class="function">ASSERT_VALID</span>(pDoc)<span class="comment">//(此处和ASSERT功能类似,都是通过宏来判定指针是否NULL,需不需要初始化)</span></span><br><span class="line">	<span class="comment">//......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="Document-View_牵一发发动全身">Document-View 牵一发发动全身</h2><p>Document为模式中的subject,负责管理数据,view则是observer,用于显示document中的数据,使用者通过view看到document,也可以通过view改变document,view是document对外显示的接口.但是,view并不是独立的,而是保存在document frame的窗口内的.当document变化的时候,就会调用updateAllView进行对所有观察者的更新.因为在单个view下可以有多个数据的存在,所以此时需要一种一对多的依赖关系,并且在document的状态改变的时候,所有依赖它的对象都会得到消息并且更新.这也是observer模式的初衷.<br><img src="http://i.imgur.com/pZ37k.jpg" alt="observer2"></p>
+<p>后面根据具体代码分析.CFrameWnd(派生于CObject的类都可以接受消息,消息网路这里不讨论了)接受到系统发出的WM_CREATE消息,然后引发<code>CFrameWnd::OnCreate()-&gt;CFrameWnd::OnCreateHelper()-&gt;CFrameWnd::OnCreateClient()-&gt;CFrameWnd::CreateView()</code>;</p>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="literal">void</span> CFrameWnd<span class="tag">::CreateView</span>(CCreateContext<span class="subst">*</span> pContext,<span class="built_in">..</span>)</span><br><span class="line">&#123;</span><br><span class="line">	CWnd<span class="subst">*</span> pView<span class="subst">=</span>(CWnd<span class="subst">*</span> ) pContext<span class="subst">-&gt;</span>m_pNewViewClass<span class="subst">-&gt;</span>CreateObject();</span><br><span class="line">	pView<span class="subst">-&gt;</span>Create(<span class="attribute">...</span><span class="built_in">.</span>)</span><br><span class="line">	<span class="comment">//......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="http://i.imgur.com/8ZV9A.jpg" alt="observer"></p>
+<p>建立了多个View以后,CDocument有m_ViewList维护一系列的View.CFrameWnd仅有CView* m_pViewActive.指示现在正在活动的View.如果CDocument发生改变,就会调用UpdateAllViews()函数,使整个m_ViewList里面的View都update.这就是observer模式了.</p>
+<hr>
+<h2 id="文件serialization_永久机制">文件serialization 永久机制</h2><p>MFC之所以为应用程序框架,一个重要的特征就是能够将管理数据和负责数据显示的代码分离开来.看到这个特征,很自然的想起Bridge这样一种模式.正如无数设计模式的书上说的一样,设计模式是一种思想,它不立足于实现,一个很简单的例子:你一看到刚才那个特征,你就应该反应到这是桥接模式,但是你可以不知道桥接模式是怎么实现的,你只需要先知道概念,通过需求推导出模式,后面才是实现细节.这才是设计模式的根本.<br><img src="http://i.imgur.com/4ScY9.jpg" alt="bridge"></p>
+<p>CArchive和CFile的client类是CDocument.例如<code>CDocument::OnSaveDocument()</code>函数里面,</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">void CDocument<span class="value">::<span class="function">OnSaveDocument</span>(..)</span><br><span class="line">&#123;</span><br><span class="line">	CFile* pFile=<span class="function">GetFile</span>(...)</span><br><span class="line">	CArchive <span class="function">saveArchive</span>(pFile,CArchive::Store);</span></span><br><span class="line">	<span class="function">Serialize</span>(saveArchive);</span><br><span class="line">	<span class="comment">//......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>CArchive(实际上是文件缓冲区)和CFile之间的串行化设计采用了桥接模式.CArchive实现client需要的一系列接口(包括输入输出流的重载(&gt;&gt;&amp;&lt;&lt;)),数据则由CFile来操作,不考虑文件究竟以何种形式储存,数据的形式以及处理都是由CFile处理,实现了抽象于具体的分离.使得两个类CArchive和CFile可以在互不影响的情况下进行修改.所有需要写入文件读取文件的操作都在CArchive里面 ,它获得CFile作为参数,从而获取文件名,请求类型以及其他必要信息.</p>
+
+        
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </div>
+  </div>
+
+
+      
+    
+      
+        
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
               <a class="post-title-link" href="/2012/11/24/design_pattern_first/">
                 Design_pattern_first
               </a>
@@ -461,7 +551,7 @@ dsq.src = <span class="string">'http://'</span> + disqus_shortname + <span class
         <div class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">18</span>
+              <span class="site-state-item-count">19</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

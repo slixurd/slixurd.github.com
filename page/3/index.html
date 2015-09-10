@@ -149,6 +149,223 @@
           
           
             
+              <a class="post-title-link" href="/2013/04/26/how_the_qrcode_encode/">
+                QRCODE介绍与编码简介
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于 2013-04-26
+        </span>
+
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2013/04/26/how_the_qrcode_encode/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2013/04/26/how_the_qrcode_encode/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <h1 id="初涉二维码编码原理">初涉二维码编码原理</h1><hr>
+<h2 id="基础常识">基础常识</h2><p>二维码发源于日本<br>有四种规范(参考ISO/IEC 18004:2006(E))</p>
+<blockquote>
+<p>QRCode Model 1,QRCode Model 2,QRCode 2005,The Micro QRCode</p>
+</blockquote>
+<p>Model1是最早的版本,数据量小而且在图像变形的时候无法读取</p>
+<p>Model2是增强版本,增加了对齐位</p>
+<p> <img src="http://i.imgur.com/3641QoR.png" alt="model1"> <img src="http://i.imgur.com/zXE7svr.png" alt="model2"> </p>
+<p>QRCode 2005 和Model2完全兼容,只是增加了一些其他特性.(实在不知道怎么翻译).Model2可以被本规格译码器直接译码.,有1-40号的版本.是主流二维码标准<br>The Micro QRCode 只需要左上角一个寻象图形(1:1:3:1:1)和2码元的留白</p>
+<blockquote>
+<blockquote>
+<p><img src="http://i.imgur.com/2DvKAbe.png" alt="micro"> MICRO QR</p>
+</blockquote>
+</blockquote>
+<p>当然时代在发展,而且有不属于规范中的二维码,根据<a href="http://www.qrcode.com/en/codes/" target="_blank" rel="external">QRCODE官网</a> 如果将MODEL 1 2分开,有共计6种规格,(温馨提示,请不要选择中文版本,中文版本不全,选择英日韩均可).分别是MODEL 1/2,Micro QR,IQR,SQRC,logoQ.</p>
+<p>下面简单说说QRCode 2005的新特性</p>
+<ol>
+<li>版本16以上的QRCODE支持结构链接,也就是一个数据文件拆分成多个QR码序列</li>
+<li>支持更多的字符集,例如Arabic,Cyrillic, Greek</li>
+<li>支持颜色反转,将黑白反转依然可以读取,例如b(经测试,不少二维码读取软件都不支持这样的读取)</li>
+<li>支持图像水平反转,例如下图的c</li>
+</ol>
+<p><img src="http://i.imgur.com/4YRLkPE.png" alt="Imgur"></p>
+<p>颜色反转这种功能非常有用,例如你的电池,你的充电器,不少都是黑色的,上面有印着白色二维码(例如骚尼的充电器),请不要吐槽为什么不贴张白色贴纸然后用黑色二维码,或者是原本那塑料和包装纸就是白色的(不是所有的充电器都是水果牌</p>
+<p><img src="http://i.imgur.com/QzyRx5o.png" alt="ac"> <img src="http://i.imgur.com/HZxq2vR.png" alt="battery"></p>
+<h2 id="基本结构">基本结构</h2><hr>
+<p>若无特殊说明,一切基于QRCODE 2005说明(除了特殊说明,Model 2一般和QRCODE 2005相同)<br>QRCode版本1的码元数目为21<em> 21(码元就是一个bit,黑点为1,白点为0,不考虑颜色反转).版本N的码元边长为17+4</em>N.也就是说每增加一个版本,边长增加4.</p>
+<p><img src="http://i.imgur.com/gZXjhQP.png" alt="QR_Character_Placement.png"></p>
+<h4 id="寻象图形_Finder_Pattern">寻象图形 Finder Pattern</h4><p>寻象图形比例为1:1:3:1:1.无论何种规格,均为7个码元,颜色分别是黑白黑白黑,另外,寻象图形周围有1个码元宽度的分隔符Separator,全部为白色,如下图</p>
+<p><img src="http://i.imgur.com/QO7iWqV.gif" alt="finder_pattern.png"></p>
+<h4 id="定位图形_Timing_pattern">定位图形 Timing pattern</h4><p>水平和垂直定位图形均宽1个码元(one module wide),黑白相间,在两个寻象图形之间,与其中一边对齐.定位图形的意义在于二维码初次检测的时候便于确定两个寻象图形的距离,以计算该二维码的版本号.</p>
+<h4 id="校正图形_Alignment_patterns">校正图形 Alignment patterns</h4><p>一个5*5的方块,外围的一圈黑色加上中心的一个黑色码元.版本2以上均有.(所以上方的图没有校正图形)</p>
+<p><img src="http://i.imgur.com/AM1lTo6.png" alt="preview"></p>
+<h2 id="编码">编码</h2><hr>
+<ol>
+<li>数据分析 分析数据类型确定编码方式,可以进行混编,同时确定数据量,如果没有指定版本,那么按照当前纠正等级所匹配的最小版本来填充数据.</li>
+<li>数据编码 数据转换成8bit流,并且在模式段前加入模式指示符(如果模式混编需要加入指定模式符)</li>
+<li>纠错编码 按照标准将数据流分块,通过RS码进行校验编码.生成纠错码字(一般为系统码)</li>
+<li>构造最终信息 按照标准将bit流放入数据块中,未填充完全则加入剩余位</li>
+<li>布置模块 放入寻象图形,分隔符,校正图形,定位图形和码字(8bit)</li>
+<li>掩模 根据4个罚分标准评价结果取掩模</li>
+<li>放入格式信息(掩模,纠错级别).一些版本(&gt;=7)还需要放入版本信息.</li>
+</ol>
+<p><em>p.s. 系统码指信息位和校验位分别存放,还有对应的非系统码,均可以在QRCode中使用,非系统码的意义在于重新调整区域信息,以达到自己想要的图形,相信说道这里已经有人知道非系统码可以用来做什么了</em></p>
+<p> ~~6.4.2.1 ECI Designator 暂时没有全看懂,先说一下懂的东西,ECI扩展和ECI指定符暂时不会= = ~~</p>
+<p>ECI可以简单认为是后续数据的编码模式,不过包含着其他数据.如果一个数据流最开始不是缺省ECI(0111)那么随后每一段(segment)最前端都需要有ECI标头,如果以缺省的ECI开始，位流的开头为第一个模式的指示符。</p>
+<p><strong>最终的位串由模式指示符（4位）,字符计数指示符(Character Count Indicator),数据位流组成.</strong></p>
+<pre><code>ECI    <span class="number">0111</span>
+数字    <span class="number">0001</span>
+字母数字    <span class="number">0010</span>
+<span class="number">8</span>位字节    <span class="number">0100</span>
+日本汉字    <span class="number">1000</span>
+中国汉字    <span class="number">1101</span>
+结构链接    <span class="number">0011</span>
+F<span class="label">NC1</span> <span class="number">0101</span> <span class="comment">(第一位置)</span><span class="number">1001</span> <span class="comment">(第二位置)</span><span class="comment">(不懂FNC1,别问我= =)</span>
+终止符 <span class="number">0000</span>
+</code></pre><p>字符计数指示符用来表明随后的字符有多少位,字符计数指示符的长度可以查表得出.</p>
+<p><img src="http://i.imgur.com/ki2QtQd.png" alt="character count indicator"></p>
+<p>注:中文汉字和日文汉字相同</p>
+<h4 id="数字模式">数字模式</h4><p>十进制数字,3个一组编码成10bit.</p>
+<p>例如1-H版本.01234567分组012 345 67.那么</p>
+<pre><code>012-&gt;<span class="number">0000001100</span>
+345-&gt;<span class="number">0101011001</span>
+67-&gt;<span class="number">1000011</span>
+</code></pre><p>可以看到,如果数字只剩下3个,则用7bit编码,如果只剩下一个,则用4位编码.2^10=1024,可以表示0-999,2^7=128,用于表示0-99,2^4=16,用于表示0-9.<br>使用率将近97%,所以储存的数据量相比其他的二维码要大不少.</p>
+<p>好,然后继续编码.数字的模式指示符为0001,01234567一共8个,根据查表字符计数指示符,1-9版本的数字,字符计数指示符都是10,对8进行编码,得到0000001000.</p>
+<p>所以增加了ECI标头的最终数据为0001 0000001000 0000001100 0101011001 1000011</p>
+<h4 id="数字字母模式">数字字母模式</h4><p>两位一组编码成11bit</p>
+<p><img src="http://i.imgur.com/vvgfuzI.png" alt="alphanumeric"></p>
+<p>本模式拥有0-9,A-Z的 <strong>大写</strong> 和少数符号组成,一共45种.因此对于一个字符串AB,其结果为45A+B的二进制,最大恰好11位.2025种组合对应2048,利用率将近99%.以下为示例</p>
+<pre><code>AC-42
+
+AC-42→(<span class="number">10,12,41,4</span>,2)
+(<span class="number">10,12)10*45</span>+<span class="number">12→462→00</span><span class="number">111001110</span>
+(<span class="number">41,4)41*45</span>+<span class="number">4→1849→111</span><span class="number">00111001</span>
+(2)→<span class="number">2→000010</span>
+
+模式指示符:0010
+字符数字:5 ---&gt;查表得9位--&gt;5-&gt;<span class="number">000000101</span>
+结果:<span class="number">0010 00000</span><span class="number">0101 001110</span><span class="number">01110 111001</span><span class="number">11001 00001</span>0
+</code></pre><h4 id="字节流">字节流</h4><p>直接8bit一个码字</p>
+<h4 id="汉字">汉字</h4><p>中文汉字的编码,需要由日文编码JIS X 0208的值转换而来,太繁琐了,只能请参见各种论文了.</p>
+<h3 id="补足余位">补足余位</h3><p>当然,最终完成编码的时候还需要在后面补上0000这个终止符,这个终止符如果剩余位数不足4位,可以截短,如果大于等于4位,均补0000.补全结束以后,如果该编码不足长度能整除8,那么继续补0,补齐8位.随后会放上 <a href="http://www.thonky.com/qr-code-tutorial/data-encoding/#step-4-add-the-character-count-indicator" target="_blank" rel="external">thonky</a>的例子.</p>
+<p>补全以后如果编码还是太短未到当前版本要求容量,那就增加<strong>11101100 00010001</strong>直到填满容量.十进制是236和17,至此编码数据结束,可以开始编码纠错模块.</p>
+<pre><code>在1-Q版本中编码 HELLO WORLD这11个字母.
+查表可知,1-Q一共有13个码字,总容量<span class="number">13*8=104</span>bit.
+模式指示符: 0010
+字符位数指示符(9位): <span class="number">00001011</span>(十进制数字是11)
+数据编码: <span class="number">01100001011</span> <span class="number">01111000110</span> <span class="number">10001011100 101</span><span class="number">10111000 100</span><span class="number">11010100 00</span>1101
+以上编码总计74位.由于未达到总容量,所以补全0000终止符(如果以上编码102位,那么就只需要补00)
+终止符: 0000
+
+以上编码结束后,需要分成8bit一个码字
+<span class="number">00100000 01</span><span class="number">011011 00</span><span class="number">001011 01</span><span class="number">111000 110100</span><span class="number">01 01110010</span> <span class="number">11011100 01</span><span class="number">001101 01000</span>011      010000
+发现最后一个码字只有6位,那么补全到<span class="number">8位0100000</span>
+由于容量目前是<span class="number">74+4+2=80</span>,那么需要补全到104还需要24bit.填充<span class="number">11101100 00</span>010001.
+<span class="number">00100000 01</span><span class="number">011011 00</span><span class="number">001011 01</span><span class="number">111000 110100</span><span class="number">01 01110010</span> <span class="number">11011100 01</span><span class="number">001101 01000</span><span class="number">011 01000</span>000  <span class="number">11101100 00</span><span class="number">010001 111</span>01100
+</code></pre><p>编码结束.</p>
+<h2 id="纠错编码">纠错编码</h2><hr>
+<p>纠错一共有4个等级,恢复容量分别是<strong>L 7% M 15% Q 25 % H 30%</strong></p>
+<p>恢复容量的计算:如果初始有100个bit,我们希望能够恢复其中50个bit,那么这50个bit需要2倍的bit才能够纠错(具体请查阅有关论文!),所以现在一共有100+50*2=200bit.恢复容量=50/200=25%.也就是Q级.</p>
+<p>纠错码字可以纠正两种类型的错误，<strong>拒读错误</strong>（错误码字的位置已知,既无法扫描到或者无法译码,例如缺失了某一角）和<strong>替代错误</strong>（错误码字位置未知,既读取到了该模块,但是由于奇奇怪怪的问题导导致黑读成了白,白读成了黑）。</p>
+<p>首先,你要知道什么是多项式除法,例如3x^2+x-1被x+1除,相信学过高中数学的都会.<br>然后,你要知道什么是<strong>The Galois Field伽罗瓦域</strong>,也叫有限域.这里取GF(2^8),将数字运算限定在8位数里面.<br>伽罗瓦域需要<strong>模二取余</strong>(也就是XOR),并且以绝对值进行运算<br>例如1+1=2%2=0,1 ^1=0(这个是抑或XOR).0+1=1;1 ^0=1;</p>
+<p>加罗瓦域2^8以<strong>100011101</strong> ( 285)表示主模块多项式x^8+x^4+x^3+x^2+1,用这个数字对超出255的数字进行XOR. 2^8=256^285=29</p>
+<p>好了= =,如果连续两个星期熬夜到三四点的我还能活多几个星期的话,我会把这一段补完,重开一篇新的文章的…不然直接看原文<a href="http://www.thonky.com/qr-code-tutorial/error-correction-coding/" target="_blank" rel="external">error-correction-coding</a>吧 </p>
+<p>跳过如果RS编码那一块,接着就是如何排列这一些数据块.又是查表,例如查询版本5-H.</p>
+<pre><code><span class="number">5</span>    H    <span class="number">88</span>    <span class="number">2</span>    <span class="comment">(33,11,11)</span>
+                     <span class="number">2</span>    <span class="comment">(33,12,11)</span>
+</code></pre><p>(c, k, r): c =码字总数    k =数据码字数    r =纠错容量</p>
+<p>计算公式:c=k+2r.这里也就是之前所说的纠错一个bit需要2bit.</p>
+<p>5-H版本纠错码字数为88(这个数字可以由r和块数计算出来,这里是4*2r=88),纠错块数为4,分成前2个和后2个.分成不同大小的块数是因为总码字无法直接整除12.</p>
+<blockquote>
+<blockquote>
+<p>块1 D1    D2    D3   …   D11          E1    E2    … E22</p>
+<p>块2 D12 D13 D14 …  D22          E23 E24 … E44</p>
+<p>块3 D23 D24 D25 …  D33 D34  E45 E46 … E66</p>
+<p>块4 D35 D36 D37 …  D45 D46  E67 E68 … E88</p>
+</blockquote>
+</blockquote>
+<p>版本5-H符号的最终码字序列为D1, D12, D23, D35, D2, D13, D24, D36, … D11, D22, D33, D45, D34, D46, E1, E23, E45, E67, E2, E24, E46, E68, … E22, E44, E66, E88。如果需要，在最后的码字后面加上剩余位（0）。</p>
+<p>由于找不到5-H的编码图形,用GIMP自己画会死的= =,只好用其他版本的了.下面这个图形,对于码字,排列顺序是从左到右,以蛇行方式排列,对于bit,实际上是以z字形不断扩展的.</p>
+<p><img src="http://i.imgur.com/MZfX6PB.png" alt=""></p>
+<h2 id="掩模">掩模</h2><hr>
+<p>掩模要事先除去功能图形,但是评分却是对整个图形进行的.一共有8种掩模,掩模的编号对二维码解码来说可以说是最重要的,如果无法正确识别掩模就无法读取整个图形的信息.</p>
+<p><strong>罚分标准</strong>:不仅仅是使整个图形黑白比例接近1:1,还有其余的判分标准.</p>
+<pre><code>行/列中相临的模块的颜色相同
+模块块的颜色相同--模块数 = <span class="params">(<span class="number">5</span> + i)</span>                                         罚分:N1 + i
+颜色相同的模块组成<span class="built_in">*</span>块-块尺寸 = m×n                                  罚分:N2× <span class="params">(m - <span class="number">1</span>)</span>×<span class="params">(n - <span class="number">1</span>)</span>
+在行/纵列中出现<span class="number">1</span>:<span class="number">1</span>:<span class="number">3</span>:<span class="number">1</span>:<span class="number">1</span>图形                                                 罚分:N3
+整个符号中深色模块的比率-<span class="number">50</span>±<span class="params">(<span class="number">5</span>×k)</span><span class="built_in">%</span> 到 <span class="number">50</span>±<span class="params">(<span class="number">5</span>×<span class="params">(k + <span class="number">1</span>)</span>)</span><span class="built_in">%</span>   罚分:N4×k
+</code></pre><p>N1到N4为对符合以上特征所罚分数的权重（N1=3，N2=3，N3=40，N4=10）</p>
+<p>选择掩模结果中罚分最低的掩模图形用于符号掩模</p>
+<p><img src="http://i.imgur.com/sXtObKd.png" alt="xor"></p>
+<h3 id="格式信息">格式信息</h3><p>格式信息为15位，其中有5个数据位，10个是用BCH（15，5）编码计算得到的纠错位。</p>
+<p>格式信息一共有两份,一份排布在左上角的寻象图形外围(需要去掉timing pattern交叉的两个点,恰好15位),另外一份拆分成两个部分,一部分在左下角寻象图形右侧,从低到高为0-7,另一部分在右上角寻象图形下方,有后7位,从右至左8-15</p>
+<p><strong>纠错等级指示符(1-2位):</strong></p>
+<p>L:01            M:00            Q:11            H:10</p>
+<p><strong>掩模图形指示符(3-5位):</strong><br>000-111</p>
+<p>将15位格式信息与掩模图形101010000010010进行XOR运算</p>
+<p><strong>L:11</strong>            <strong>M:10</strong>            <strong>Q:01</strong>            <strong>H:00</strong></p>
+<p>这个就是我们肉眼所见的能直观判断该图的纠错级别的符号.</p>
+<p><strong>版本信息</strong></p>
+<p>版本信息为18位，其中，6位数据位，通过BCH（18，6）编码计算出12个纠错位,放置在版本信息位.</p>
+<p>只有版本7～40的符号包含版本信息</p>
+<hr>
+<p>至此整个编码过程结束.各种个性化的二维码生成有机会再慢慢讲,当然前提是我看懂了那些论文和算法们.</p>
+<hr>
+<p>部分图片,资料取自维基百科</p>
+<p>部分图片,资料取自专利书ISO/IEC 18004:2006(E)</p>
+<p>部分来源  <a href="http://www.thonky.com/qr-code-tutorial/data-encoding/#step-4-add-the-character-count-indicator" target="_blank" rel="external">thonky</a></p>
+
+        
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </div>
+  </div>
+
+
+      
+    
+      
+        
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
               <a class="post-title-link" href="/2012/12/26/madoka/">
                 魔法少女小圆
               </a>
@@ -553,96 +770,6 @@
 
       
     
-      
-        
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2012/11/25/mfc_design_pattern_glit/">
-                MFC之设计模式分析
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          发表于 2012-11-25
-        </span>
-
-        
-
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2012/11/25/mfc_design_pattern_glit/#comments" >
-              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2012/11/25/mfc_design_pattern_glit/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <h1 id="MFC之设计模式分析">MFC之设计模式分析</h1><p><img src="http://i.imgur.com/xPk2f.jpg" alt="all"></p>
-<h2 id="程序的起点_命运之始">程序的起点 命运之始</h2><p>既然是C++程序,必然是由main函数(MFC中是WinMain)开始的.MFC作为一个成熟的软件框架,自然有着老练的一套-一个程序的实例需要有唯一的初始化(这里并不表示一个程序只能打开一次(即一个实例),仅能有一个实例这是通过自己重载initApplication实现的,但是这并不是其初衷).因此在程序尚未初始化的时候,就利用全局函数AfxGetApp取得该程序theApp的对象指针,然后用该指针指导后续界面,功能的加载.</p>
-<p>显然,<strong>这里用的是Singleton模式</strong>.不直接对类进行初始化转而利用函数获得该类的指针以保证仅有一个实例.</p>
-<blockquote>
-<p><code>pApp-&gt;InitApplication()</code></p>
-<p><code>pApp-&gt;InitInstance()</code></p>
-</blockquote>
-<p><img src="http://i.imgur.com/UPxku.jpg" alt="Imgur"></p>
-<p>当然这里的Singleton和我们一般学习的不太相同,但是这也体现了设计模式并不是照搬的这一重要特点.设计模式并不是传统的模式,更应该说是一种设计思想,其实现方式可以各种各样.一般的Singleton采用将构造函数设置为protected,这样就可以避免client类错误初始化(Java Script就没有,所以需要用其他方法),然后设计一个静态static的指针返回该类指针.MFC中使用的更类似JS的方法:<code>ASSERT(AfxGetThread() == NULL);</code>.即,如果<code>AfxGetThread() == NULL</code>,那么初始化,否则失败.<br>借由Singleton模式,对程序进行初始化.基本顺序是<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1. <span class="tag">pApp-</span>&gt;<span class="tag">InitInstance</span>()</span><br><span class="line">2. <span class="rule"><span class="attribute">CmyWinApp</span>:<span class="value">:<span class="function">InitInstance</span>() </span><br><span class="line">   &#123;</span><br><span class="line">	m_pMainWnd=new CMyFrameWnd</span></span>;</span><br><span class="line">   &#125;</span><br><span class="line">3. <span class="rule"><span class="attribute">CMyFrameWnd</span>:<span class="value">:<span class="function">Create</span>()&#123;<span class="function">CreateEx</span>()</span></span>;&#125;</span><br><span class="line">4. <span class="rule"><span class="attribute">CWnd</span>:<span class="value">:<span class="function">CreateEx</span>()&#123;<span class="function">PreCreateWindow</span>()</span></span>;&#125;</span><br></pre></td></tr></table></figure></p>
-<p>由于有RTTI的原因,所以有很多地方就不需要用到常用的设计模式了,因为已经能够自己识别自己的类型,就不需要另外的抽象和实现的分离.简单说一下,RTTI分为两种,均用C风格的MACRO来编写,动态识别分别为<code>DECLARE_DYNAMIC</code>和 <code>IMPLEMENT_DYNAMIC</code>,动态创建为<code>DECLARE_DYNCREATE</code>和<code>IMPLEMENT_DYNCREATE</code>.这里主要讨论设计模式,所以对RTTI不作细究.当然RTTI贯穿整个MFC,是非常重要的元素.</p>
-<p>另外,并不仅仅只有pApp才用了Singleton模式,其他的例如CDC也有使用.</p>
-<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">void CScribbleView<span class="value">::<span class="function">OnDraw</span>(CDC* pDC)</span><br><span class="line">&#123;</span><br><span class="line">	CScribbleDoc* pDoc = <span class="function">GetDocument</span>();</span></span><br><span class="line">	<span class="function">ASSERT_VALID</span>(pDoc)<span class="comment">//(此处和ASSERT功能类似,都是通过宏来判定指针是否NULL,需不需要初始化)</span></span><br><span class="line">	<span class="comment">//......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<hr>
-<h2 id="Document-View_牵一发发动全身">Document-View 牵一发发动全身</h2><p>Document为模式中的subject,负责管理数据,view则是observer,用于显示document中的数据,使用者通过view看到document,也可以通过view改变document,view是document对外显示的接口.但是,view并不是独立的,而是保存在document frame的窗口内的.当document变化的时候,就会调用updateAllView进行对所有观察者的更新.因为在单个view下可以有多个数据的存在,所以此时需要一种一对多的依赖关系,并且在document的状态改变的时候,所有依赖它的对象都会得到消息并且更新.这也是observer模式的初衷.<br><img src="http://i.imgur.com/pZ37k.jpg" alt="observer2"></p>
-<p>后面根据具体代码分析.CFrameWnd(派生于CObject的类都可以接受消息,消息网路这里不讨论了)接受到系统发出的WM_CREATE消息,然后引发<code>CFrameWnd::OnCreate()-&gt;CFrameWnd::OnCreateHelper()-&gt;CFrameWnd::OnCreateClient()-&gt;CFrameWnd::CreateView()</code>;</p>
-<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="literal">void</span> CFrameWnd<span class="tag">::CreateView</span>(CCreateContext<span class="subst">*</span> pContext,<span class="built_in">..</span>)</span><br><span class="line">&#123;</span><br><span class="line">	CWnd<span class="subst">*</span> pView<span class="subst">=</span>(CWnd<span class="subst">*</span> ) pContext<span class="subst">-&gt;</span>m_pNewViewClass<span class="subst">-&gt;</span>CreateObject();</span><br><span class="line">	pView<span class="subst">-&gt;</span>Create(<span class="attribute">...</span><span class="built_in">.</span>)</span><br><span class="line">	<span class="comment">//......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><img src="http://i.imgur.com/8ZV9A.jpg" alt="observer"></p>
-<p>建立了多个View以后,CDocument有m_ViewList维护一系列的View.CFrameWnd仅有CView* m_pViewActive.指示现在正在活动的View.如果CDocument发生改变,就会调用UpdateAllViews()函数,使整个m_ViewList里面的View都update.这就是observer模式了.</p>
-<hr>
-<h2 id="文件serialization_永久机制">文件serialization 永久机制</h2><p>MFC之所以为应用程序框架,一个重要的特征就是能够将管理数据和负责数据显示的代码分离开来.看到这个特征,很自然的想起Bridge这样一种模式.正如无数设计模式的书上说的一样,设计模式是一种思想,它不立足于实现,一个很简单的例子:你一看到刚才那个特征,你就应该反应到这是桥接模式,但是你可以不知道桥接模式是怎么实现的,你只需要先知道概念,通过需求推导出模式,后面才是实现细节.这才是设计模式的根本.<br><img src="http://i.imgur.com/4ScY9.jpg" alt="bridge"></p>
-<p>CArchive和CFile的client类是CDocument.例如<code>CDocument::OnSaveDocument()</code>函数里面,</p>
-<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">void CDocument<span class="value">::<span class="function">OnSaveDocument</span>(..)</span><br><span class="line">&#123;</span><br><span class="line">	CFile* pFile=<span class="function">GetFile</span>(...)</span><br><span class="line">	CArchive <span class="function">saveArchive</span>(pFile,CArchive::Store);</span></span><br><span class="line">	<span class="function">Serialize</span>(saveArchive);</span><br><span class="line">	<span class="comment">//......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>CArchive(实际上是文件缓冲区)和CFile之间的串行化设计采用了桥接模式.CArchive实现client需要的一系列接口(包括输入输出流的重载(&gt;&gt;&amp;&lt;&lt;)),数据则由CFile来操作,不考虑文件究竟以何种形式储存,数据的形式以及处理都是由CFile处理,实现了抽象于具体的分离.使得两个类CArchive和CFile可以在互不影响的情况下进行修改.所有需要写入文件读取文件的操作都在CArchive里面 ,它获得CFile作为参数,从而获取文件名,请求类型以及其他必要信息.</p>
-
-        
-      
-    </div>
-
-    <div class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </div>
-  </div>
-
-
-      
-    
   </div>
 
   
@@ -681,7 +808,7 @@
         <div class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">18</span>
+              <span class="site-state-item-count">19</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
